@@ -1,0 +1,205 @@
+
+/* ----------------------------------------------------
+   BUTTONS (EXPORT / COLUMN VISIBILITY)
+---------------------------------------------------- */
+.dt-buttons .dt-button {
+    background: #fff !important;
+    border: 2px solid #e5e7eb !important;
+    padding: 8px 16px !important;
+    border-radius: 10px !important;
+    font-size: 14px !important;
+    color: #374151 !important;
+    transition: 0.2s;
+}
+
+.dt-buttons .dt-button:hover {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    color: white !important;
+    border-color: transparent !important;
+}
+
+/* Dropdown panel */
+.dt-button-collection {
+    background: white !important;
+    border-radius: 12px !important;
+    padding: 6px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+/* ----------------------------------------------------
+   REVIEWS TABLE SPECIAL RULES
+---------------------------------------------------- */
+#reviewsTable td:nth-child(3),   /* product */
+#reviewsTable td:nth-child(4),   /* customer */
+#reviewsTable td:nth-child(6) {  /* review */
+    white-space: normal !important;
+}
+
+#reviewsTable td:nth-child(6) {
+    max-width: 300px !important;
+}
+
+.status-badge {
+    padding: 4px 12px !important;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-active { background: #d1fae5; color: #065f46; }
+.status-pending { background: #fef3c7; color: #92400e; }
+.status-inactive { background: #fee2e2; color: #991b1b; }
+
+
+
+/* ------------------------------
+   TABULATOR TABLE STYLING
+------------------------------ */
+
+.tabulator {
+    background-color: white;
+    border: none;
+    font-family: 'Inter', sans-serif;
+}
+
+.tabulator .tabulator-header {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    color: #fff !important;
+    border: none;
+}
+
+.tabulator .tabulator-header .tabulator-col {
+    border: none;
+    background: none;
+}
+
+.tabulator .tabulator-header .tabulator-col .tabulator-col-content {
+    padding: 16px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.5px;
+    white-space: nowrap !important;
+}
+
+.tabulator .tabulator-tableholder {
+    background: #fff;
+}
+
+.tabulator .tabulator-tableholder .tabulator-table {
+    background: #fff;
+}
+
+.tabulator .tabulator-tableholder .tabulator-table .tabulator-row {
+    border-bottom: 1px solid #f3f4f6 !important;
+    background: #fff !important;
+}
+
+.tabulator .tabulator-tableholder .tabulator-table .tabulator-row .tabulator-cell {
+    padding: 14px 16px !important;
+    font-size: 14px !important;
+    color: #374151;
+    white-space: nowrap;
+    border: none !important;
+}
+
+.tabulator-row.tabulator-selected {
+    background-color: #f3f4f6 !important;
+}
+
+/* Pagination */
+.tabulator .tabulator-footer {
+    border-top: 1px solid #e5e7eb;
+    background: #fff;
+}
+
+.tabulator .tabulator-footer .tabulator-paginator {
+    color: #6b7280;
+}
+
+.tabulator .tabulator-footer .tabulator-page {
+    border: 2px solid #e5e7eb !important;
+    background: #fff !important;
+    color: #4b5563 !important;
+    padding: 8px 14px !important;
+    border-radius: 10px !important;
+    margin: 0 4px;
+    transition: 0.2s ease;
+}
+
+.tabulator .tabulator-footer .tabulator-page:hover {
+    border-color: #6366f1 !important;
+    background: #f9fafb !important;
+    color: #6366f1 !important;
+}
+
+.tabulator .tabulator-footer .tabulator-page.active {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    color: white !important;
+    border-color: transparent !important;
+}
+
+.tabulator .tabulator-footer .tabulator-page-size {
+    border: 2px solid #e5e7eb !important;
+    border-radius: 10px !important;
+    padding: 8px 32px 8px 12px !important;
+    background: #fff !important;
+    font-size: 14px !important;
+}
+
+/* Column Selectability */
+.tabulator .tabulator-col.tabulator-col-selectable,
+.tabulator .tabulator-table .tabulator-cell.tabulator-cell-selectable {
+    text-align: center;
+}
+
+/* Header Filters */
+.tabulator-header input,
+.tabulator-header select {
+    width: 100%;
+    padding: 6px 10px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 13px;
+    color: #111 !important;
+}
+
+.tabulator-header input::placeholder {
+    color: #6b7280 !important;
+}
+
+.tabulator-header input:focus,
+.tabulator-header select:focus {
+    outline: none;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 2px #c7d2fe;
+}
+
+/* Hover effect on header */
+.tabulator .tabulator-header .tabulator-col:hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+    cursor: pointer;
+}
+
+/* Search input (global toolbar) */
+.tabulator-search-input {
+    width: 260px !important;
+    padding: 10px 16px !important;
+    font-size: 14px !important;
+    border: 2px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    background: #fff !important;
+    color: #374151 !important;
+    transition: 0.3s ease !important;
+}
+
+.tabulator-search-input:focus {
+    border-color: #6366f1 !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Horizontal scroll fix */
+.tabulator .tabulator-tableholder {
+    overflow-x: auto !important;
+}
+
