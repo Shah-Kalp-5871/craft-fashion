@@ -103,20 +103,12 @@
                                     @php
                                         $variant = $item->variant;
                                         $product = $variant->product;
-                                        $image = null;
-                                        if ($variant->images) {
-                                            $images = is_string($variant->images) ? json_decode($variant->images, true) : $variant->images;
-                                            $image = $images[0] ?? null;
-                                        }
-                                        if (!$image && $product->primary_image) {
-                                            $image = $product->primary_image;
-                                        }
                                     @endphp
                                     <div class="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 flex flex-col h-full wishlist-item" data-id="{{ $item->id }}" data-variant-id="{{ $item->product_variant_id }}">
                                         <!-- Product Image -->
                                         <div class="relative aspect-square overflow-hidden bg-gray-100">
-                                            @if($image)
-                                                <img src="{{ asset('storage/' . $image) }}" alt="{{ $product->name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
+                                            @if($variant->display_image)
+                                                <img src="{{ $variant->display_image }}" alt="{{ $product->name }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                                             @else
                                                 <div class="w-full h-full flex items-center justify-center text-gray-300">
                                                     <i class="fas fa-image text-4xl"></i>

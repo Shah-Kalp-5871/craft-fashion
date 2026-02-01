@@ -104,23 +104,23 @@
 
 @section('content')
 <!-- Modern Hero Section -->
-<section class="relative py-16 bg-gradient-to-br from-primary/10 via-white to-primary/5 overflow-hidden">
+<section class="relative py-8 md:py-16 bg-gradient-to-br from-primary/10 via-white to-primary/5 overflow-hidden">
     <div class="absolute inset-0 bg-white/60 z-0"></div>
     <div class="absolute top-10 right-10 w-72 h-72 bg-primary/10 rounded-full blur-3xl"></div>
     <div class="absolute bottom-10 left-10 w-96 h-96 bg-primary/5 rounded-full blur-3xl"></div>
 
     <div class="container mx-auto px-4 relative z-10">
         <div class="max-w-4xl mx-auto text-center">
-            <div class="inline-flex items-center bg-primary/10 text-dark px-4 py-2 rounded-full text-sm font-medium mb-6">
+            <div class="inline-flex items-center bg-primary/10 text-dark px-4 py-2 rounded-full text-xs md:text-sm font-medium mb-4 md:mb-6">
                 <i class="fas fa-lock mr-2"></i>
                 Secure Checkout
             </div>
 
-            <h1 class="text-5xl md:text-6xl font-bold font-playfair text-dark mb-6 leading-tight">
+            <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold font-playfair text-dark mb-4 md:mb-6 leading-tight">
                 Complete Your <span class="text-primary">Order</span>
             </h1>
 
-            <p class="text-xl text-secondary max-w-2xl mx-auto leading-relaxed">
+            <p class="text-base md:text-xl text-secondary max-w-2xl mx-auto leading-relaxed">
                 Finalize your purchase with secure payment and fast delivery
             </p>
         </div>
@@ -131,24 +131,24 @@
 <section class="py-16 bg-white">
     <div class="container mx-auto px-4">
         <!-- Progress Steps -->
-        <div class="max-w-4xl mx-auto mb-12" data-aos="fade-down">
-            <div class="flex items-center justify-between">
+        <div class="max-w-4xl mx-auto mb-8 md:mb-12" data-aos="fade-down">
+            <div class="flex items-center justify-between text-xs md:text-base">
                 <div class="flex items-center text-primary">
-                    <div class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mr-3">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mr-2 md:mr-3">
                         1
                     </div>
                     <span class="font-semibold">Cart</span>
                 </div>
-                <div class="flex-1 h-1 bg-primary mx-4"></div>
+                <div class="flex-1 h-1 bg-primary mx-2 md:mx-4"></div>
                 <div class="flex items-center text-primary">
-                    <div class="w-10 h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mr-3">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mr-2 md:mr-3">
                         2
                     </div>
                     <span class="font-semibold">Checkout</span>
                 </div>
-                <div class="flex-1 h-1 bg-gray-200 mx-4"></div>
+                <div class="flex-1 h-1 bg-gray-200 mx-2 md:mx-4"></div>
                 <div class="flex items-center text-secondary">
-                    <div class="w-10 h-10 bg-gray-200 text-secondary rounded-full flex items-center justify-center font-bold mr-3">
+                    <div class="w-8 h-8 md:w-10 md:h-10 bg-gray-200 text-secondary rounded-full flex items-center justify-center font-bold mr-2 md:mr-3">
                         3
                     </div>
                     <span class="font-semibold">Confirmation</span>
@@ -159,7 +159,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
             <!-- Customer Details Form -->
             <div data-aos="fade-right">
-                <div class="bg-white rounded-3xl shadow-lg border border-primary/10 p-8">
+                <div class="bg-white rounded-3xl shadow-lg border border-primary/10 p-4 md:p-8">
                     <div class="flex items-center mb-6">
                         <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mr-4">
                             <i class="fas fa-user text-primary text-xl"></i>
@@ -275,26 +275,8 @@
                             </div>
                         </div>
 
-                        <!-- Delivery Options -->
-                        <div class="border-t border-gray-200 pt-6 mb-6">
-                            <h3 class="text-lg font-semibold text-dark mb-4">Shipping Method</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <label class="flex items-center p-4 border-2 border-primary bg-primary/5 rounded-2xl cursor-pointer hover:border-primary/50 shipping-option selected" data-value="standard">
-                                    <input type="radio" name="delivery" value="standard" class="text-primary focus:ring-primary" checked>
-                                    <div class="ml-3">
-                                        <span class="font-medium text-dark">Standard Delivery</span>
-                                        <p class="text-sm text-secondary">3-5 business days - ₹100</p>
-                                    </div>
-                                </label>
-                                <label class="flex items-center p-4 border-2 border-gray-200 rounded-2xl cursor-pointer hover:border-primary/50 shipping-option" data-value="express">
-                                    <input type="radio" name="delivery" value="express" class="text-primary focus:ring-primary">
-                                    <div class="ml-3">
-                                        <span class="font-medium text-dark">Express Delivery</span>
-                                        <p class="text-sm text-secondary">1-2 business days - ₹200</p>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
+                        <!-- Delivery Options (Hidden but functionality preserved for backend) -->
+                        <input type="hidden" name="delivery" value="standard">
 
                         <div class="border-t border-gray-200 pt-6">
                             <h3 class="text-lg font-semibold text-dark mb-4">Payment Method</h3>
@@ -333,7 +315,7 @@
 
             <!-- Order Summary -->
             <div data-aos="fade-left">
-                <div class="bg-white rounded-3xl shadow-lg border border-primary/10 p-8 sticky top-6">
+                <div class="bg-white rounded-3xl shadow-lg border border-primary/10 p-4 md:p-8 sticky top-6">
                     <div class="flex items-center mb-6">
                         <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mr-4">
                             <i class="fas fa-shopping-bag text-primary text-xl"></i>
@@ -402,16 +384,16 @@
                             <p class="text-sm text-secondary mb-3">100% Secure Payment</p>
                             <div class="flex justify-center space-x-4">
                                 <div class="w-10 h-6 bg-gray-100 rounded flex items-center justify-center">
-                                    <i class="fab fa-cc-visa text-blue-600"></i>
+                                    <i class="fab fa-cc-visa text-blue-600 text-lg"></i>
                                 </div>
                                 <div class="w-10 h-6 bg-gray-100 rounded flex items-center justify-center">
-                                    <i class="fab fa-cc-mastercard text-red-600"></i>
+                                    <i class="fab fa-cc-mastercard text-red-600 text-lg"></i>
                                 </div>
                                 <div class="w-10 h-6 bg-gray-100 rounded flex items-center justify-center">
-                                    <i class="fab fa-cc-razorpay text-blue-500"></i>
+                                    <i class="fas fa-credit-card text-blue-500 text-lg"></i>
                                 </div>
                                 <div class="w-10 h-6 bg-gray-100 rounded flex items-center justify-center">
-                                    <i class="fas fa-shield-alt text-green-500"></i>
+                                    <i class="fas fa-shield-alt text-green-500 text-lg"></i>
                                 </div>
                             </div>
                         </div>
@@ -487,24 +469,10 @@
             }
         };
 
-        // Selection of Shipping Method
-        const shippingOptions = document.querySelectorAll('.shipping-option');
-        shippingOptions.forEach(option => {
-            option.addEventListener('click', function () {
-                shippingOptions.forEach(opt => {
-                    opt.classList.remove('selected', 'bg-primary/5', 'border-primary');
-                    opt.classList.add('border-gray-200');
-                });
-                this.classList.add('selected', 'bg-primary/5', 'border-primary');
-                this.classList.remove('border-gray-200');
-                const radio = this.querySelector('input[type="radio"]');
-                radio.checked = true;
-                
-                // Update summary
-                const cost = this.dataset.value === 'express' ? 200 : 100;
-                updateSummary(cost);
-            });
-        });
+        // Initialize with Standard Shipping (100)
+        updateSummary(100);
+
+
 
         // Selection of Payment Method
         const paymentOptions = document.querySelectorAll('.payment-option');

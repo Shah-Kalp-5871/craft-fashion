@@ -34,6 +34,98 @@ class AuthController extends Controller
         return view('customer.auth.forgot-password');
     }
 
+    public function sendResetLinkEmail(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|exists:customers,email',
+        ], [
+            'email.required' => 'Email address is required',
+            'email.email' => 'Please enter a valid email address',
+            'email.exists' => 'We can\'t find a user with that email address.',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $token = str_replace('/', '', bcrypt(\Str::random(40)));
+        
+        // Save token to DB (using standard password_reset_tokens table)
+        \DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $request->email],
+            [
+                'email' => $request->email,
+                'token' => Hash::make($token),
+                'created_at' => now()
+            ]
+        );
+
+        // Send Email
+        try {
+            Mail::to($request->email)->send(new \App\Mail\CustomerResetPassword($token, $request->email));
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to send reset link. Please try again.');
+        }
+
+        return back()->with('success', 'We have e-mailed your password reset link!');
+    }
+
+    public function showResetPasswordForm(Request $request, $token = null)
+    {
+        return view('customer.auth.reset-password')->with(
+            ['token' => $token, 'email' => $request->email]
+        );
+    }
+
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => [
+                'required',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/'
+            ],
+        ], [
+            'password.regex' => 'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character',
+        ]);
+
+        $record = \DB::table('password_reset_tokens')
+                    ->where('email', $request->email)
+                    ->first();
+
+        if (!$record || !Hash::check($request->token, $record->token)) {
+             return back()->withInput()->with('error', 'Invalid token!');
+        }
+
+        // Check if token is expired (e.g. 60 mins)
+        if (Carbon::parse($record->created_at)->addMinutes(60)->isPast()) {
+             \DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+             return back()->with('error', 'Token expired!');
+        }
+
+        // Update Password
+        $customer = Customer::where('email', $request->email)->first();
+        if ($customer) {
+            $customer->update([
+                'password' => Hash::make($request->password),
+                'password_changed_at' => now(),
+            ]);
+
+            // Delete token
+            \DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+
+            return redirect()->route('customer.login')
+                ->with('success', 'Your password has been reset!');
+        }
+
+        return back()->with('error', 'User not found.');
+    }
+
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [

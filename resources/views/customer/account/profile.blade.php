@@ -53,9 +53,9 @@
                             <i class="fas fa-heart w-6"></i>
                             <span>Wishlist</span>
                         </a>
-                        <a href="{{ route('customer.account.change-password') }}" class="flex items-center px-4 py-3 text-secondary hover:bg-gray-50 hover:text-dark font-medium rounded-xl transition-colors">
+                        <a href="{{ route('customer.forgot-password') }}" class="flex items-center px-4 py-3 text-secondary hover:bg-gray-50 hover:text-dark font-medium rounded-xl transition-colors">
                             <i class="fas fa-lock w-6"></i>
-                            <span>Change Password</span>
+                            <span>Forgot Password</span>
                         </a>
                         <form action="{{ route('customer.logout') }}" method="POST" class="border-t border-gray-100 mt-2 pt-2">
                             @csrf

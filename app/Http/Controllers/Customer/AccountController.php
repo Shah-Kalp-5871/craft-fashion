@@ -8,6 +8,7 @@ use App\Models\CustomerAddress;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Wishlist;
+use App\Models\WishlistItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -36,7 +37,10 @@ class AccountController extends Controller
             });
 
         // Get wishlist count
-        $wishlistCount = Wishlist::where('customer_id', $customer->id)->count();
+        // Get wishlist count
+        $wishlistCount = WishlistItem::whereHas('wishlist', function($query) use ($customer) {
+            $query->where('customer_id', $customer->id);
+        })->count();
 
         // Get cart items count (from session or database)
         $cartCount = 0; // You'll need to implement your cart logic

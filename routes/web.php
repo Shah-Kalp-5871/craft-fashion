@@ -410,6 +410,10 @@ Route::name('customer.')->group(function () {
     Route::post('/logout', [CustomerAuth::class, 'logout'])->name('logout');
     
     Route::get('/forgot-password', [CustomerAuth::class, 'showForgotPassword'])->name('forgot-password');
+    Route::post('/forgot-password', [CustomerAuth::class, 'sendResetLinkEmail'])->name('forgot-password.submit');
+    
+    Route::get('/reset-password/{token}', [CustomerAuth::class, 'showResetPasswordForm'])->name('reset-password');
+    Route::post('/reset-password', [CustomerAuth::class, 'resetPassword'])->name('reset-password.update');
 
     /*
     |--------------------------------------------------------------------------

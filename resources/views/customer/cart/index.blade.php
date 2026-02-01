@@ -264,40 +264,59 @@ const formatCurrency = (amount) => {
     });
 };
 
+// Debounce helper
+const debounceTimers = {};
+function debounce(key, func, delay) {
+    if (debounceTimers[key]) clearTimeout(debounceTimers[key]);
+    debounceTimers[key] = setTimeout(func, delay);
+}
+
 function changeQuantity(itemId, delta) {
     const input = document.getElementById(`qty-input-${itemId}`);
     if (!input) return;
     
-    let newQty = parseInt(input.value) + delta;
+    let currentQty = parseInt(input.value);
+    let newQty = currentQty + delta;
+    
+    // Prevent going below 1
     if (newQty < 1) return;
     
-    updateQuantity(itemId, newQty);
+    // 1. Optimistic UI Update
+    input.value = newQty;
+    
+    // 2. Toggle Minus Button State locally
+    const buttons = input.parentElement.querySelectorAll('button');
+    buttons.forEach(btn => {
+        if (btn.dataset.type === 'minus') {
+            btn.disabled = (newQty <= 1);
+        }
+    });
+    
+    // 3. Visual feedback (optional: dim the total to show it's stale)
+    const itemTotalEl = document.getElementById(`item-total-${itemId}`);
+    if(itemTotalEl) itemTotalEl.style.opacity = '0.5';
+
+    // 4. Debounced Server Update
+    debounce(`cart-update-${itemId}`, () => {
+        updateQuantity(itemId, newQty);
+    }, 500);
 }
 
 async function updateQuantity(itemId, quantity) {
     const input = document.getElementById(`qty-input-${itemId}`);
-    if (!input) return;
-    
-    const originalQty = input.value;
-    
-    // Disable buttons temporarily
-    const buttons = input.parentElement.querySelectorAll('button');
-    buttons.forEach(btn => btn.disabled = true);
+    const itemTotalEl = document.getElementById(`item-total-${itemId}`);
     
     try {
         const response = await axios.put(`{{ url('/cart/update') }}/${itemId}`, { quantity: quantity });
         if (response.data.success) {
             const cart = response.data.data.cart;
             
-            // Update input
-            input.value = quantity;
-            
             // Update item total
-            const itemTotalEl = document.getElementById(`item-total-${itemId}`);
             if (itemTotalEl) {
                 const returnedItem = cart.items.find(i => i.id == itemId);
                 if (returnedItem) {
                     itemTotalEl.textContent = formatCurrency(returnedItem.total);
+                    itemTotalEl.style.opacity = '1';
                 }
             }
             
@@ -311,15 +330,17 @@ async function updateQuantity(itemId, quantity) {
         }
     } catch (error) {
         console.error(error);
-        input.value = originalQty;
+        // Revert on error
+        if (input) {
+            // We might want to fetch the fresh cart or just decrement/increment back
+            // For now, simpler to alert and reload or let user try again. 
+            // Better UX:
+             alert(error.response?.data?.message || 'Failed to update quantity');
+             // Optionally reload to sync state
+             // window.location.reload(); 
+        }
     } finally {
-        buttons.forEach(btn => {
-            if (btn.dataset.type === 'minus') {
-                btn.disabled = (parseInt(input.value) <= 1);
-            } else {
-                btn.disabled = false;
-            }
-        });
+        if(itemTotalEl) itemTotalEl.style.opacity = '1';
     }
 }
 
