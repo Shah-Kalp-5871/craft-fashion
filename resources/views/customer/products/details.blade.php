@@ -799,6 +799,17 @@
         });
     }
 
+    // Reset button state when page is restored from back/forward cache
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            const btn = document.getElementById('buyNowBtn');
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-bolt"></i> Buy Now';
+            }
+        }
+    });
+
     // Initialize stars on load
     setRating(5);
 </script>

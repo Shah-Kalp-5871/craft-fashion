@@ -247,8 +247,8 @@ class RazorpayService
 
             // Update order payment status
             $order->update([
-                'payment_status' => $razorpayPayment->status === 'captured' ? 'paid' : 'failed',
-                'status' => $razorpayPayment->status === 'captured' ? 'confirmed' : 'failed'
+                'payment_status' => in_array($razorpayPayment->status, ['captured', 'authorized']) ? 'paid' : 'failed',
+                'status' => in_array($razorpayPayment->status, ['captured', 'authorized']) ? 'confirmed' : 'failed'
             ]);
 
             DB::commit();

@@ -693,8 +693,15 @@ async function handleFileUpload(event, key) {
             }
         });
 
-        if (response.data.success && response.data.data.uploaded.length > 0) {
-            const url = response.data.data.uploaded[0].url;
+        if (response.data.success) {
+            let url = '';
+            if (response.data.all_uploaded && response.data.all_uploaded.length > 0) {
+                url = response.data.all_uploaded[0].url;
+            } else if (response.data.data && response.data.data.url) {
+                url = response.data.data.url;
+            } else if (response.data.url) { // Fallback
+                url = response.data.url; 
+            }
             const input = document.getElementById(key);
             if (input) {
                 input.value = url;

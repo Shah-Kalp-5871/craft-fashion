@@ -233,89 +233,67 @@ class AuthController extends Controller
                 ->with('form', 'register');
         }
 
-        // Create customer
-        $customer = Customer::create([
+        // Generate Email OTP
+        $emailOTP = rand(100000, 999999);
+
+        // Prepare customer data for temporary storage
+        $customerData = [
             'name' => ucwords(strtolower(trim($request->name))),
             'email' => strtolower(trim($request->email)),
             'mobile' => trim($request->mobile),
             'password' => Hash::make($request->password),
-            'status' => 1, // Auto-activate
-            'created_at' => now(),
-            'updated_at' => now()
-        ]);
-
-        // Auto Login
-        Auth::guard('customer')->login($customer);
-        
-        // Sync cart immediately
-        $this->cartHelper->syncCart();
-
-        // Generate Email OTP
-        $emailOTP = rand(100000, 999999);
-
-        // Send OTP via Email
-        try {
-            Mail::to($customer->email)->send(new OTPVerify($emailOTP));
-        } catch (\Exception $e) {
-            \Log::error('OTP Email sending failed: ' . $e->getMessage());
-            // Continue registration to allow manual resend later or show error? 
-            // Better to show error but for now let's proceed so we can at least debug.
-        }
-
-        // Store verification data in cache with unique key
-        $verificationKey = 'verify_' . md5($customer->email . time());
-        $verificationData = [
-            'customer_id' => $customer->id,
-            'email' => $customer->email,
-            'mobile' => $customer->mobile,
+            'status' => 1,
             'email_otp' => $emailOTP,
-            'attempts' => 0,
             'created_at' => now()->timestamp
         ];
 
-        Cache::put($verificationKey, $verificationData, 300); // 5 minutes
-        Cache::put('email_otp_' . $customer->email, $emailOTP, 300);
+        // Send OTP via Email
+        try {
+            Mail::to($customerData['email'])->send(new OTPVerify($emailOTP));
+        } catch (\Exception $e) {
+            \Log::error('OTP Email sending failed: ' . $e->getMessage());
+        }
 
-        // Store verification key in session
-        session(['verification_key' => $verificationKey]);
+        // Generate a verification key based on email
+        $verificationKey = 'temp_reg_' . md5($customerData['email'] . time());
+
+        // Cache the registration data (valid for 30 minutes, ample time to verify)
+        Cache::put($verificationKey, $customerData, 1800);
+        Cache::put('email_otp_' . $customerData['email'], $emailOTP, 1800);
+
+        // Store minimal data in session to identify the pending registration
+        session([
+            'verification_key' => $verificationKey,
+            'email' => $customerData['email'],
+            'mobile' => $customerData['mobile']
+        ]);
 
         return redirect()->route('customer.verify')
             ->with([
-                'customer_id' => $customer->id,
-                'email' => $customer->email,
-                'verification_key' => $verificationKey,
-                'success' => 'Registration successful! Please check your email for OTP.'
+                'success' => 'Please verify your email to complete registration.'
             ]);
     }
 
     public function verifyPage()
     {
-        // 1. If Logged In, allow access
+        // 1. If Logged In, redirect if already verified
         if (Auth::guard('customer')->check()) {
             $customer = Auth::guard('customer')->user();
-            
-            // If already verified, go home
             if ($customer->email_verified_at) {
                 return redirect()->route('customer.home.index');
             }
-            
-            // If session keys missing, restore them for the view
-            if (!session()->has('email')) {
+            // If logged in but not verified (legacy/existing user case), show verify page
+             if (!session()->has('email')) {
                 session(['email' => $customer->email]);
             }
-            
-            // If verification key missing, maybe we just render view 
-            // and let them click "Resend" if OTP is lost?
-            // Or better, trigger a resend if completely empty?
-            // For now, let's just show the view. The view uses session('email')
-            
             return view('customer.auth.verify');
         }
 
-        // 2. If Guest, check session
-        if (!session()->has('verification_key') && !session()->has('customer_id')) {
+        // 2. If Guest (New Registration Flow)
+        // Check if we have a pending registration in session
+        if (!session()->has('verification_key') || !session()->has('email')) {
             return redirect()->route('customer.register')
-                ->with('error', 'Please register first to get verification OTPs.');
+                ->with('error', 'Session expired. Please register again.');
         }
 
         return view('customer.auth.verify');
@@ -324,7 +302,6 @@ class AuthController extends Controller
     public function verify(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'email_otp' => 'required|numeric|digits:6',
             'email_otp' => 'required|numeric|digits:6'
         ], [
             'email_otp.required' => 'Email OTP is required',
@@ -339,207 +316,164 @@ class AuthController extends Controller
                 ->with('form', 'verify');
         }
 
-        // Get verification data
         $verificationKey = session('verification_key');
-        $customerId = session('customer_id');
         $email = session('email');
-        $mobile = session('mobile');
 
-        // Try to get from cache if session data is missing
-        if ($verificationKey) {
-            $verificationData = Cache::get($verificationKey);
-            if ($verificationData) {
-                $customerId = $verificationData['customer_id'];
-                $email = $verificationData['email'];
-                $mobile = $verificationData['mobile'];
-
-                // Check attempts
-                if ($verificationData['attempts'] >= 5) {
-                    Cache::forget($verificationKey);
-                    Cache::forget($verificationKey);
-                    Cache::forget('email_otp_' . $email);
-
-                    return redirect()->route('customer.register')
-                        ->with('error', 'Too many failed attempts. Please register again.');
-                }
-            }
-        }
-
-        if (!$customerId && Auth::guard('customer')->check()) {
-            $customer = Auth::guard('customer')->user();
-            $customerId = $customer->id;
-            $email = $customer->email;
-        }
-
-        if (!$customerId || !$email) {
-            return redirect()->route('customer.register')
-                ->with('error', 'Verification session expired. Please register again.');
-        }
-
-        // Get cached OTPs
-        $cachedEmailOTP = Cache::get('email_otp_' . $email);
-
-        // Verify OTPs
-        if (
-            !$cachedEmailOTP ||
-            $cachedEmailOTP != $request->email_otp
-        ) {
-
-            // Increment attempts
-            if ($verificationKey && $verificationData) {
-                $verificationData['attempts']++;
-                Cache::put($verificationKey, $verificationData, 300);
+        // CASE 1: New Registration (Data in Cache)
+        if ($verificationKey && Cache::has($verificationKey)) {
+            $data = Cache::get($verificationKey);
+            
+            // Validate OTP
+            if ($data['email_otp'] != $request->email_otp) {
+                return redirect()->back()
+                    ->withErrors(['email_otp' => 'Invalid OTP. Please try again.'])
+                    ->withInput();
             }
 
-            return redirect()->back()
-                ->withErrors(['otp' => 'Invalid OTP. Please try again.'])
-                ->withInput()
-                ->with('form', 'verify');
-        }
-
-        // OTPs verified - update customer
-        $customer = Customer::find($customerId);
-        if ($customer) {
-            $customer->update([
-                'email_verified_at' => now(),
-                'mobile_verified_at' => now(),
+            // Create Customer NOW
+            $customer = Customer::create([
+                'name' => $data['name'],
+                'email' => $data['email'],
+                'mobile' => $data['mobile'],
+                'password' => $data['password'],
                 'status' => 1,
+                'email_verified_at' => now(),
+                'mobile_verified_at' => now(), // Assuming mobile is verified implicitly or skipped
+                'created_at' => now(),
                 'updated_at' => now()
             ]);
 
-            // Clear all cached data
-            // Clear all cached data
-            if ($verificationKey) {
-                Cache::forget($verificationKey);
-            }
+            // Clear Cache & Session
+            Cache::forget($verificationKey);
             Cache::forget('email_otp_' . $email);
+            session()->forget(['verification_key', 'email', 'mobile']);
 
-            // Clear session
-            session()->forget([
-                'verification_key',
-                'customer_id',
-                'email',
-                'mobile',
-                'email_otp'
-            ]);
-
-            // Auto login
+            // Login
             Auth::guard('customer')->login($customer);
-            
-            // Sync cart immediately after verification login
             $this->cartHelper->syncCart();
 
             return redirect()->route('customer.home.index')
-                ->with('success', 'Verification successful! Welcome to ' . config('app.name'));
+                ->with('success', 'Account created successfully! Welcome to ' . config('app.name'));
         }
 
-        return redirect()->route('customer.register')->with('error', 'Customer not found.');
+        // CASE 2: Existing User (Logged in but unverified)
+        if (Auth::guard('customer')->check()) {
+            $customer = Auth::guard('customer')->user();
+            $cachedEmailOTP = Cache::get('email_otp_' . $customer->email);
+
+            if (!$cachedEmailOTP || $cachedEmailOTP != $request->email_otp) {
+                return redirect()->back()
+                    ->withErrors(['email_otp' => 'Invalid OTP. Please try again.'])
+                    ->withInput();
+            }
+
+            $customer->update([
+                'email_verified_at' => now(),
+                'status' => 1
+            ]);
+            
+            Cache::forget('email_otp_' . $customer->email);
+
+            return redirect()->route('customer.home.index')
+                ->with('success', 'Email verified successfully!');
+        }
+
+        return redirect()->route('customer.register')
+            ->with('error', 'Session expired or invalid request. Please register again.');
     }
 
     public function resendOTP(Request $request)
     {
         $verificationKey = session('verification_key');
-        $customerId = session('customer_id');
         $email = session('email');
-        $mobile = session('mobile');
-
-        if (!$verificationKey || !$customerId || !$email || !$mobile) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Session expired. Please register again.'
-            ], 400);
-        }
-
-        // Get customer
-        $customer = Customer::find($customerId);
-        if (!$customer) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Customer not found.'
-            ], 400);
-        }
-
-        // Generate new OTPs
-        // Generate new OTPs
-        $newEmailOTP = rand(100000, 999999);
-
-        // Update cache
-        Cache::put('email_otp_' . $email, $newEmailOTP, 300);
-
-        // Update verification data
-        $verificationData = Cache::get($verificationKey);
-        if ($verificationData) {
-            $verificationData['email_otp'] = $newEmailOTP;
-            $verificationData['attempts'] = 0;
-            Cache::put($verificationKey, $verificationData, 300);
-        }
         
-        // Send OTP via Email
-        try {
-            Mail::to($email)->send(new OTPVerify($newEmailOTP));
-        } catch (\Exception $e) {
-            \Log::error('OTP Resend Email failed: ' . $e->getMessage());
-             return response()->json([
-                'success' => false,
-                'message' => 'Failed to send email. Please try again.'
-            ], 500);
+        // Check if pending registration exists
+        if ($verificationKey && Cache::has($verificationKey)) {
+            $data = Cache::get($verificationKey);
+            $email = $data['email']; // Ensure we use the cached email
+            
+            $newEmailOTP = rand(100000, 999999);
+            
+            // Update OTP in cached data
+            $data['email_otp'] = $newEmailOTP;
+            Cache::put($verificationKey, $data, 1800);
+            Cache::put('email_otp_' . $email, $newEmailOTP, 1800);
+
+            try {
+                Mail::to($email)->send(new OTPVerify($newEmailOTP));
+                return response()->json(['success' => true, 'message' => 'OTP resent to ' . $email]);
+            } catch (\Exception $e) {
+                return response()->json(['success' => false, 'message' => 'Failed to send email.'], 500);
+            }
         }
 
-        // Update session
-        session(['email_otp' => $newEmailOTP]);
+        // Fallback for existing users
+        if (session('customer_id') || Auth::guard('customer')->check()) {
+             $userEmail = session('email');
+             if(Auth::guard('customer')->check()) {
+                 $userEmail = Auth::guard('customer')->user()->email;
+             }
+
+             if ($userEmail) {
+                 $newEmailOTP = rand(100000, 999999);
+                 Cache::put('email_otp_' . $userEmail, $newEmailOTP, 300);
+                 try {
+                    Mail::to($userEmail)->send(new OTPVerify($newEmailOTP));
+                    return response()->json(['success' => true, 'message' => 'OTP resent to ' . $userEmail]);
+                } catch (\Exception $e) {
+                    return response()->json(['success' => false, 'message' => 'Failed to send email.'], 500);
+                }
+             }
+        }
 
         return response()->json([
-            'success' => true,
-            'message' => 'OTP resent successfully to ' . $email,
-        ]);
+            'success' => false,
+            'message' => 'Session expired. Please register again.'
+        ], 400);
     }
 
     public function changeEmail(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|max:150|unique:customers,email'
-        ], [
-            'email.required' => 'Email address is required',
-            'email.email' => 'Please enter a valid email address',
-            'email.unique' => 'This email is already registered'
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => $validator->errors()->first()
-            ], 400);
+            return response()->json(['success' => false, 'message' => $validator->errors()->first()], 400);
         }
 
-        $customerId = session('customer_id');
-        if (!$customerId) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Session expired. Please register again.'
-            ], 400);
-        }
-
-        $customer = Customer::find($customerId);
-        if (!$customer) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Customer not found.'
-            ], 400);
-        }
-
-        // Update email
-        $oldEmail = $customer->email;
-        $customer->email = strtolower(trim($request->email));
-        $customer->save();
-
-        // Clear old cache
-        Cache::forget('email_otp_' . $oldEmail);
+        $verificationKey = session('verification_key');
         
-        // Update Session
-        session(['email' => $customer->email]);
+        // Update pending registration
+        if ($verificationKey && Cache::has($verificationKey)) {
+            $data = Cache::get($verificationKey);
+            $oldEmail = $data['email'];
+            
+            // Update email in data
+            $data['email'] = strtolower(trim($request->email));
+            $newEmailOTP = rand(100000, 999999);
+            $data['email_otp'] = $newEmailOTP;
+            
+            // Save with NEW key (email changed) or same key? 
+            // Better to keep same key but update content.
+            // But cache key depended on hash... let's just update the content for the existing key 
+            // because strict "verificationKey" link is in session.
+            
+            Cache::put($verificationKey, $data, 1800);
+            Cache::forget('email_otp_' . $oldEmail);
+            Cache::put('email_otp_' . $data['email'], $newEmailOTP, 1800);
+            
+            session(['email' => $data['email']]);
 
-        // Resend OTP to new email
-        return $this->resendOTP($request);
+            try {
+                Mail::to($data['email'])->send(new OTPVerify($newEmailOTP));
+                return response()->json(['success' => true, 'message' => 'Email updated & OTP sent!']);
+            } catch (\Exception $e) {
+                return response()->json(['success' => false, 'message' => 'Failed to send OTP.'], 500);
+            }
+        }
+        
+        return response()->json(['success' => false, 'message' => 'Cannot change email for this session.'], 400);
     }
 
     public function logout()

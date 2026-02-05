@@ -631,7 +631,13 @@
                 } else {
                     // Show error message
                     console.log('❌ Pincode verification failed:', response.data.message);
-                    feedbackEl.innerHTML = `<span class="text-red-500 font-semibold"><i class="fas fa-times-circle mr-1"></i> Pincode is not verified. Enter correct pincode</span>`;
+                    
+                    let errorMsg = response.data.message || 'Pincode is not verified. Enter correct pincode';
+                    if (response.data.debug_error) {
+                        errorMsg += ` <span class="text-xs text-red-400">(${response.data.debug_error})</span>`;
+                    }
+                    
+                    feedbackEl.innerHTML = `<span class="text-red-500 font-semibold"><i class="fas fa-times-circle mr-1"></i> ${errorMsg}</span>`;
                     isPincodeVerified = false;
                     
                     // Hide Customer Information Section

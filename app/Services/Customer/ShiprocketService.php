@@ -169,6 +169,8 @@ class ShiprocketService
 
             $data = $response->json();
 
+            Log::info('Shiprocket API Response', ['data' => $data]);
+
             // Process and format available couriers
             $availableCouriers = $this->processAvailableCouriers($data);
 
@@ -272,10 +274,7 @@ class ShiprocketService
             $orderData = [
                 'order_id' => $order->order_number,
                 'order_date' => $order->created_at->format('Y-m-d'),
-                'order_id' => $order->order_number,
-                'order_date' => $order->created_at->format('Y-m-d'),
                 'pickup_location' => config('services.shiprocket.pickup_location', 'Primary'),
-                'channel_id' => '',
                 'channel_id' => '',
                 'comment' => '',
                 'reseller_name' => '',
@@ -326,16 +325,21 @@ class ShiprocketService
             }
 
             $shiprocketData = $response->json();
+            
+            if (!isset($shiprocketData['order_id'])) {
+                Log::error('Shiprocket response missing order_id', ['response' => $shiprocketData]);
+                throw new Exception('Invalid response from shipping provider');
+            }
 
             // Create shipment record
             $shipment = Shipment::create([
                 'order_id' => $order->id,
                 'shiprocket_order_id' => $shiprocketData['order_id'],
-                'shipment_id' => $shiprocketData['shipment_id'],
+                'shipment_id' => $shiprocketData['shipment_id'] ?? null,
                 'status' => 'created',
-                'courier_id' => $shiprocketData['courier_company_id'],
-                'courier_name' => $shiprocketData['courier_name'],
-                'tracking_number' => $shiprocketData['awb_code'],
+                'courier_id' => $shiprocketData['courier_company_id'] ?? null,
+                'courier_name' => $shiprocketData['courier_name'] ?? null,
+                'tracking_number' => $shiprocketData['awb_code'] ?? null,
                 'shipping_label_url' => $shiprocketData['label_url'] ?? null,
                 'manifest_url' => $shiprocketData['manifest_url'] ?? null,
                 'shiprocket_response' => $shiprocketData,

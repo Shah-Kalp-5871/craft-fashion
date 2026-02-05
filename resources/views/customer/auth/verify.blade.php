@@ -30,6 +30,9 @@
                         </div>
                         <input type="text" 
                                name="email_otp" 
+                               inputmode="numeric"
+                               oninput="this.value = this.value.replace(/[^0-9]/g, '')"
+                               pattern="\d*"
                                class="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-center tracking-widest text-lg font-bold"
                                placeholder="123456"
                                maxlength="6"

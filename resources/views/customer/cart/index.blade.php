@@ -116,8 +116,10 @@
                                                                 onclick="changeQuantity('{{ $item['id'] }}', -1)" {{ $item['quantity'] <= 1 ? 'disabled' : '' }}>
                                                                 <i class="fas fa-minus text-sm"></i>
                                                             </button>
-                                                            <input type="number" id="qty-input-{{ $item['id'] }}" value="{{ $item['quantity'] }}" readonly
-                                                                   class="w-12 px-0 py-2 border-0 text-center focus:ring-0 focus:outline-none bg-transparent quantity-input">
+                                                            <input type="number" id="qty-input-{{ $item['id'] }}" value="{{ $item['quantity'] }}" min="1"
+                                                                   class="w-12 px-0 py-2 border-0 text-center focus:ring-0 focus:outline-none bg-transparent quantity-input appearance-none [-moz-appearance:textfield]"
+                                                                   onchange="manualUpdateQuantity(this, '{{ $item['id'] }}')"
+                                                                   onkeypress="return event.charCode >= 48 && event.charCode <= 57">
                                                             <button type="button" data-type="plus" class="quantity-control w-8 h-8 flex items-center justify-center bg-gray-100 hover:bg-gray-200 transition"
                                                                 onclick="changeQuantity('{{ $item['id'] }}', 1)">
                                                                 <i class="fas fa-plus text-sm"></i>
@@ -302,6 +304,31 @@ function changeQuantity(itemId, delta) {
     }, 500);
 }
 
+function manualUpdateQuantity(input, itemId) {
+    let newQty = parseInt(input.value);
+    
+    // Validate
+    if (isNaN(newQty) || newQty < 1) {
+        newQty = 1;
+        input.value = 1;
+    }
+    
+    // Update local UI state
+    const buttons = input.parentElement.querySelectorAll('button');
+    buttons.forEach(btn => {
+        if (btn.dataset.type === 'minus') {
+            btn.disabled = (newQty <= 1);
+        }
+    });
+
+    // Dim opacity to show loading
+    const itemTotalEl = document.getElementById(`item-total-${itemId}`);
+    if(itemTotalEl) itemTotalEl.style.opacity = '0.5';
+
+    // Trigger update immediately (no debounce needed for manual entry/blur)
+    updateQuantity(itemId, newQty);
+}
+
 async function updateQuantity(itemId, quantity) {
     const input = document.getElementById(`qty-input-${itemId}`);
     const itemTotalEl = document.getElementById(`item-total-${itemId}`);
@@ -380,28 +407,48 @@ function updateSummary(cart) {
 }
 
 async function removeItem(itemId) {
-    if (!confirm('Are you sure you want to remove this item?')) return;
-    
-    try {
-        const response = await axios.delete(`{{ url('/cart/remove') }}/${itemId}`);
-        if (response.data.success) {
-            const row = document.querySelector(`[data-item-row="${itemId}"]`);
-            if (row) {
-                row.remove();
-            }
-            
-            if (response.data.data.cart_count === 0) {
-                window.location.reload(); // Reload to show empty cart state
-            } else {
-                updateSummary(response.data.data.cart);
-                if (typeof updateCartCount === 'function') {
-                    updateCartCount(response.data.data.cart_count);
+    const result = await Swal.fire({
+        title: 'Are you sure?',
+        text: "Do you want to remove this item from your cart?",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#000',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, remove it!'
+    });
+
+    if (result.isConfirmed) {
+        try {
+            const response = await axios.delete(`{{ url('/cart/remove') }}/${itemId}`);
+            if (response.data.success) {
+                const row = document.querySelector(`[data-item-row="${itemId}"]`);
+                if (row) {
+                    row.remove();
+                }
+                
+                if (response.data.data.cart_count === 0) {
+                    window.location.reload();
+                } else {
+                    updateSummary(response.data.data.cart);
+                    if (typeof updateCartCount === 'function') {
+                        updateCartCount(response.data.data.cart_count);
+                    }
+                    
+                    Swal.fire(
+                        'Removed!',
+                        'Item has been removed from your cart.',
+                        'success'
+                    );
                 }
             }
+        } catch (error) {
+            console.error(error);
+            Swal.fire(
+                'Error!',
+                error.response?.data?.message || 'Failed to remove item',
+                'error'
+            );
         }
-    } catch (error) {
-        console.error(error);
-        alert(error.response?.data?.message || 'Failed to remove item');
     }
 }
 </script>

@@ -109,8 +109,7 @@
 
                         <div class="space-y-1 text-sm text-secondary mb-6 min-h-[80px]">
                             <p class="text-dark">{{ $address->address }}</p>
-                            <p>{{ $address->city }}, {{ $address->state }} - {{ $address->pincode }}</p>
-                            <p>{{ $address->country }}</p>
+                            <p>{{ $address->pincode }}</p>
                             <p class="pt-2"><i class="fas fa-phone-alt mr-2 text-xs"></i>{{ $address->mobile }}</p>
                         </div>
 
@@ -119,10 +118,10 @@
                                 <i class="far fa-edit mr-1.5"></i> Edit
                             </button>
                             
-                            <form action="{{ route('customer.account.addresses.delete', $address->id) }}" method="POST" onsubmit="return confirm('Are you sure you want to delete this address?');">
+                            <form id="delete-form-{{ $address->id }}" action="{{ route('customer.account.addresses.delete', $address->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="text-red-500 text-sm font-medium hover:underline flex items-center">
+                                <button type="button" onclick="confirmDelete('{{ $address->id }}')" class="text-red-500 text-sm font-medium hover:underline flex items-center">
                                     <i class="far fa-trash-alt mr-1.5"></i> Delete
                                 </button>
                             </form>
@@ -173,38 +172,21 @@
                             <label for="pincode" class="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
                             <input type="text" name="pincode" id="pincode" required maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6)" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring focus:ring-primary/20 transition shadow-sm text-sm" placeholder="123456">
                         </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="city" class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                            <input type="text" name="city" id="city" required class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring focus:ring-primary/20 transition shadow-sm text-sm" placeholder="New York">
-                        </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="state" class="block text-sm font-medium text-gray-700 mb-1">State</label>
-                            <input type="text" name="state" id="state" required class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring focus:ring-primary/20 transition shadow-sm text-sm" placeholder="NY">
-                        </div>
-                        <div class="col-span-2 md:col-span-1">
-                            <label for="country" class="block text-sm font-medium text-gray-700 mb-1">Country</label>
-                            <select name="country" id="country" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring focus:ring-primary/20 transition shadow-sm text-sm">
-                                <option value="IN">India</option>
-                                <option value="US">United States</option>
-                                <option value="UK">United Kingdom</option>
-                                <!-- Add more options as needed -->
-                            </select>
-                        </div>
                         
                         <div class="col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-2">Address Type</label>
                             <div class="flex gap-4">
                                 <label class="flex items-center">
-                                    <input type="radio" name="type" value="home" class="text-primary focus:ring-primary" checked>
-                                    <span class="ml-2 text-sm text-gray-600">Home</span>
+                                    <input type="radio" name="type" value="shipping" class="text-primary focus:ring-primary" checked>
+                                    <span class="ml-2 text-sm text-gray-600">Home/Shipping</span>
                                 </label>
                                 <label class="flex items-center">
-                                    <input type="radio" name="type" value="work" class="text-primary focus:ring-primary">
-                                    <span class="ml-2 text-sm text-gray-600">Work</span>
+                                    <input type="radio" name="type" value="billing" class="text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm text-gray-600">Work/Billing</span>
                                 </label>
                                 <label class="flex items-center">
-                                    <input type="radio" name="type" value="shipping" class="text-primary focus:ring-primary">
-                                    <span class="ml-2 text-sm text-gray-600">Other</span>
+                                    <input type="radio" name="type" value="both" class="text-primary focus:ring-primary">
+                                    <span class="ml-2 text-sm text-gray-600">Both</span>
                                 </label>
                             </div>
                         </div>
@@ -232,6 +214,22 @@
 </div>
 
 <script>
+    function confirmDelete(id) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#c98f83',
+            cancelButtonColor: '#747471',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('delete-form-' + id).submit();
+            }
+        })
+    }
+
     function openAddressModal() {
         // Reset form
         document.getElementById('addressForm').action = "{{ route('customer.account.addresses.store') }}";
@@ -242,9 +240,6 @@
         document.getElementById('mobile').value = '';
         document.getElementById('address').value = '';
         document.getElementById('pincode').value = '';
-        document.getElementById('city').value = '';
-        document.getElementById('state').value = '';
-        document.getElementById('country').value = 'IN';
         document.getElementById('is_default').checked = false;
         
         // Show modal
@@ -266,9 +261,6 @@
         document.getElementById('mobile').value = address.mobile;
         document.getElementById('address').value = address.address;
         document.getElementById('pincode').value = address.pincode;
-        document.getElementById('city').value = address.city;
-        document.getElementById('state').value = address.state;
-        document.getElementById('country').value = address.country;
         
         // Radio buttons
         const radios = document.getElementsByName('type');

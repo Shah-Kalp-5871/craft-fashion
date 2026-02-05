@@ -147,7 +147,12 @@ class CheckoutController extends Controller
 
             $order = $result['order'];
 
-            $this->razorpayService->processPayment($order, $request->all());
+            $paymentResult = $this->razorpayService->processPayment($order, $request->all());
+
+            if (!$paymentResult['success']) {
+                throw new \Exception($paymentResult['message'] ?? 'Payment processing failed');
+            }
+
             $this->shiprocketService->createOrder($order);
 
 

@@ -204,7 +204,15 @@
                 <div class="space-y-4">
                     <div>
                         <div class="text-sm text-gray-600">Payment Method</div>
-                        <div class="font-medium text-gray-900">{{ $order->paymentMethod->name ?? 'N/A' }}</div>
+                        <div class="font-medium text-gray-900">
+                            @if($order->payment_method == 'cod')
+                                Cash on Delivery
+                            @elseif($order->payment_method == 'online')
+                                Online Payment
+                            @else
+                                {{ ucfirst($order->payment_method ?? 'N/A') }}
+                            @endif
+                        </div>
                     </div>
                     <div>
                         <div class="text-sm text-gray-600">Payment Status</div>

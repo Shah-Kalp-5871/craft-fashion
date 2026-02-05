@@ -80,12 +80,21 @@
                 params: { page, search }
             });
 
-            currentMediaData = response.data;
-            renderMediaGrid(response.data.data);
-            renderPagination(response.data);
+            // response.data is { success: true, data: { data: [...], links: [...], ... } }
+            if (response.data && response.data.data) {
+                currentMediaData = response.data.data; 
+                renderMediaGrid(currentMediaData.data);
+                renderPagination(currentMediaData);
+            } else {
+                renderMediaGrid([]);
+            }
         } catch (error) {
             console.error('Media load error:', error);
-            grid.innerHTML = '<div class="col-span-full text-center py-10 text-red-500">Error loading media.</div>';
+            let message = 'Error loading media.';
+            if (error.response && error.response.data && error.response.data.message) {
+                message = error.response.data.message;
+            }
+            grid.innerHTML = `<div class="col-span-full text-center py-10 text-red-500">${message}</div>`;
         }
     }
 

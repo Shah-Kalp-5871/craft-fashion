@@ -31,51 +31,52 @@ class MediaController extends Controller
      */
     public function getData(Request $request)
     {
-        $query = Media::query();
+        try {
+            $query = Media::query();
 
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where('file_name', 'LIKE', "%{$search}%")
-                  ->orWhere('alt_text', 'LIKE', "%{$search}%");
+            if ($request->filled('search')) {
+                $search = $request->search;
+                $query->where('file_name', 'LIKE', "%{$search}%")
+                      ->orWhere('alt_text', 'LIKE', "%{$search}%");
+            }
+            
+            $query->latest();
+
+            $perPage = $request->input('per_page', 12);
+            $media = $query->paginate($perPage);
+
+            $items = $media->getCollection()->transform(function ($item) {
+                return [
+                    'id' => $item->id,
+                    'url' => asset(Storage::url($item->file_path)),
+                    'thumbnail_url' => $item->thumbnails && isset($item->thumbnails['small']) 
+                        ? asset(Storage::url($item->thumbnails['small'])) 
+                        : asset(Storage::url($item->file_path)),
+                    'file_path' => $item->file_path,
+                    'file_name' => $item->file_name,
+                    'mime_type' => $item->mime_type,
+                    'file_size' => $item->file_size,
+                    'size_formatted' => $this->formatBytes($item->file_size),
+                    'alt_text' => $item->alt_text,
+                    'created_at_formatted' => $item->created_at->format('M d, Y'),
+                    'is_image' => $item->mime_type ? str_starts_with($item->mime_type, 'image/') : false,
+                ];
+            });
+
+            $paginationData = $media->toArray();
+            $paginationData['data'] = $items;
+
+            return response()->json([
+                'success' => true,
+                'data' => $paginationData
+            ]);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Media Load Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error loading media: ' . $e->getMessage()
+            ], 500);
         }
-        
-        $query->latest();
-
-        $perPage = $request->input('per_page', 12);
-        $media = $query->paginate($perPage);
-
-        $items = $media->getCollection()->transform(function ($item) {
-            return [
-                'id' => $item->id,
-                'url' => asset(Storage::url($item->file_path)),
-                'thumbnail_url' => $item->thumbnails && isset($item->thumbnails['small']) 
-                    ? asset(Storage::url($item->thumbnails['small'])) 
-                    : asset(Storage::url($item->file_path)),
-                'file_path' => $item->file_path,
-                'file_name' => $item->file_name,
-                'mime_type' => $item->mime_type,
-                'file_size' => $item->file_size,
-                'size_formatted' => $this->formatBytes($item->file_size),
-                'alt_text' => $item->alt_text,
-                'created_at_formatted' => $item->created_at->format('M d, Y'),
-                'is_image' => str_starts_with($item->mime_type, 'image/'),
-            ];
-        });
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'data' => $items,
-                'meta' => [
-                    'current_page' => $media->currentPage(),
-                    'last_page' => $media->lastPage(),
-                    'per_page' => $media->perPage(),
-                    'total' => $media->total(),
-                    'from' => $media->firstItem(),
-                    'to' => $media->lastItem(),
-                ]
-            ]
-        ]);
     }
 
     public function upload(Request $request)
