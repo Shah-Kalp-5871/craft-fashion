@@ -209,13 +209,16 @@ $isActive = function ($route, $params = []) use ($currentRoute) {
         <!-- Logo -->
         <div class="flex items-center justify-between p-6 border-b border-gray-200/50">
             <div class="flex items-center space-x-3">
-                <div
-                    class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
-                    <i class="fas fa-store text-white text-lg"></i>
-                </div>
+                @if($logo = \App\Helpers\SettingsHelper::get('logo_url'))
+                    <img src="{{ $logo }}" alt="Logo" class="h-10 w-auto object-contain rounded-lg">
+                @else
+                    <div
+                        class="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                        <i class="fas fa-store text-primary text-lg"></i>
+                    </div>
+                @endif
                 <span
-                    class="text-xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600
-                             bg-clip-text text-transparent transition-all duration-300
+                    class="text-xl font-bold text-primary transition-all duration-300
                              text-expandable whitespace-nowrap">
                     {{ \App\Helpers\SettingsHelper::get('store_name', 'Craft Fashion') }}
                 </span>
@@ -240,10 +243,10 @@ $isActive = function ($route, $params = []) use ($currentRoute) {
                         class="parent-link flex items-center gap-3 px-4 py-3 rounded-xl
                                text-gray-700 hover:bg-white/50 hover:shadow-sm
                                transition-all duration-200 group-hover:pr-6
-                               {{ $active ? 'bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border-r-2 border-indigo-500 text-indigo-600' : '' }}">
+                               {{ $active ? 'bg-gradient-to-r from-primary/10 to-primary/5 border-r-2 border-primary text-primary' : '' }}">
                         <i
                             class="{{ $item['icon'] }} text-xl min-w-6 text-center
-                                  {{ $active ? 'text-indigo-500' : 'text-gray-400 group-hover:text-indigo-400' }}">
+                                  {{ $active ? 'text-primary' : 'text-gray-400 group-hover:text-primary' }}">
                         </i>
                         <span class="font-medium transition-all duration-300 text-expandable whitespace-nowrap">
                             {{ $item['title'] }}
@@ -264,7 +267,7 @@ $isActive = function ($route, $params = []) use ($currentRoute) {
                                 @endphp
                                 <a href="{{ route($subItem['route'], $subItem['params'] ?? []) }}"
                                     class="submenu-link block px-4 py-2 text-sm rounded-lg
-                                          {{ $subActive ? 'bg-white/50 text-indigo-600' : 'text-gray-600 hover:bg-white/50 hover:text-indigo-600' }}
+                                          {{ $subActive ? 'bg-white/50 text-primary' : 'text-gray-600 hover:bg-white/50 hover:text-primary' }}
                                           transition-all duration-200 text-expandable whitespace-nowrap">
                                     {{ $subItem['title'] }}
                                 </a>

@@ -694,11 +694,14 @@ class CartHelper
 
     public function clearCart()
     {
+        // Always clear local cart to prevent stale data
+        $this->clearLocalCart();
+
         if (Auth::guard('customer')->check()) {
             return $this->clearDatabaseCart();
         }
 
-        return $this->clearLocalCart();
+        return $this->createEmptyCartResponse();
     }
 
     private function clearDatabaseCart()

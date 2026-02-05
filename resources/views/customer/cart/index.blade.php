@@ -451,5 +451,15 @@ async function removeItem(itemId) {
         }
     }
 }
+    // Listen for cart updates from other tabs to refresh the cart page
+    const cartPageChannel = new BroadcastChannel('cart_updates');
+    cartPageChannel.onmessage = (event) => {
+        if (event.data.type === 'cart_updated') {
+            // Only reload if the update came from a DIFFERENT tab
+            if (event.data.sourceTabId && event.data.sourceTabId !== window.TAB_ID) {
+                window.location.reload();
+            }
+        }
+    };
 </script>
 @endpush

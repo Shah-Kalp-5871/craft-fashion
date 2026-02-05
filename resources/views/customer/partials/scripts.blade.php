@@ -64,8 +64,15 @@
         removeLoader();
     }, 7000);
 
+    // Generate unique Tab ID
+    window.TAB_ID = Math.random().toString(36).substr(2, 9);
+
+    // Broadcast Channel for cart synchronization
+    const cartChannel = new BroadcastChannel('cart_updates');
+
     // Cart Count Update Logic
-    function updateCartCount(count) {
+    function updateCartCount(count, fromBroadcast = false) {
+        // Update UI
         document.querySelectorAll('.cart-badge').forEach(badge => {
             if (badge) {
                 badge.textContent = count;
@@ -76,7 +83,23 @@
                 }
             }
         });
+
+        // Broadcast to other tabs if this update didn't come from a broadcast
+        if (!fromBroadcast) {
+            cartChannel.postMessage({
+                type: 'cart_updated',
+                count: count,
+                sourceTabId: window.TAB_ID
+            });
+        }
     }
+
+    // Listen for cart updates from other tabs
+    cartChannel.onmessage = (event) => {
+        if (event.data.type === 'cart_updated') {
+            updateCartCount(event.data.count, true);
+        }
+    };
 
     // Wishlist Count Update Logic
     function updateWishlistCount(count) {
@@ -230,4 +253,22 @@
             }
         }
     };
+
+    // Force refresh cart count on EVERY page show to ensure accuracy
+    // This handles Back/Forward Cache (BFCache) and normal navigation
+    window.addEventListener('pageshow', function(event) {
+        refreshCartCount();
+    });
+
+    async function refreshCartCount() {
+        try {
+            // Add timestamp to prevent browser caching of the API response
+            const response = await axios.get('{{ route('customer.cart.count') }}?t=' + new Date().getTime());
+            if (response.data.success) {
+                updateCartCount(response.data.count, true); // true = treat as local (don't re-broadcast)
+            }
+        } catch (error) {
+            console.error('Failed to refresh cart count', error);
+        }
+    }
 </script>

@@ -140,6 +140,13 @@
             duration: 800,
             once: true
         });
+
+        // Prevent Back Button
+        history.pushState(null, document.title, location.href);
+        window.addEventListener('popstate', function (event) {
+            history.pushState(null, document.title, location.href);
+            window.location.replace("{{ route('customer.home.index') }}");
+        });
     });
 </script>
 @endpush

@@ -2,8 +2,10 @@
 
 namespace App\Services\Admin;
 
+use App\Helpers\SettingsHelper;
 use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
+
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -114,12 +116,17 @@ class SettingService
                     $setting->value = $value;
                     $setting->save();
 
+                    SettingsHelper::clearCache($setting->key);
                     $updated++;
                 }
             } catch (\Exception $e) {
                 Log::error("Failed to update setting {$settingData['key']}: " . $e->getMessage());
             }
         }
+        
+        // Clear public settings cache as well since bulk update might affect public settings
+        SettingsHelper::clearCache('settings.public');
+
 
         return $updated;
     }
@@ -160,6 +167,8 @@ class SettingService
             }
 
             DB::commit();
+            
+            SettingsHelper::clearCache();
 
         } catch (\Exception $e) {
             DB::rollBack();

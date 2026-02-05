@@ -406,6 +406,15 @@
     </div>
 </section>
 
+<!-- Dynamic Home Sections -->
+@if(isset($dynamicSections) && count($dynamicSections) > 0)
+    @foreach($dynamicSections as $section)
+        @if(isset($section['style']) && View::exists('customer.home.sections.' . $section['style']))
+            @include('customer.home.sections.' . $section['style'], ['section' => $section])
+        @endif
+    @endforeach
+@endif
+
 
 <!-- Features Section -->
 <section class="py-16 bg-white">

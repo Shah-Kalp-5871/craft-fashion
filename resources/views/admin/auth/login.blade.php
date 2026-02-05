@@ -5,9 +5,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - eCommerce Admin Panel</title>
+    <link rel="icon" href="{{ \App\Helpers\SettingsHelper::get('favicon_url', asset('favicon.ico')) }}">
 
     <!-- TailwindCSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '{{ \App\Helpers\SettingsHelper::get('theme_color', '#c98f83') }}',
+                        secondary: '#747471',
+                        dark: '#393333',
+                    },
+                    fontFamily: {
+                        'playfair': ['"Playfair Display"', 'serif'],
+                        'poppins': ['Poppins', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -16,14 +34,18 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap');
 
         * {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
 
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            /* Fallback */
+            background-color: #f3f4f6; 
+            /* Dynamic Primary Color Background with overlay */
+            background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(255,255,255,0.9)), 
+                        linear-gradient(135deg, {{ \App\Helpers\SettingsHelper::get('theme_color', '#c98f83') }} 0%, #333 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -38,7 +60,7 @@
         }
 
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-color: {{ \App\Helpers\SettingsHelper::get('theme_color', '#c98f83') }};
             color: white;
             padding: 12px 24px;
             border-radius: 10px;
@@ -46,8 +68,9 @@
         }
 
         .btn-primary:hover {
-            box-shadow: 0 10px 15px rgba(102, 126, 234, 0.4);
+            filter: brightness(90%);
             transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
@@ -56,15 +79,19 @@
     <div class="glass rounded-2xl shadow-2xl overflow-hidden max-w-md w-full">
         <!-- Logo Header -->
         <div class="p-8 text-center border-b border-gray-100">
-            <div
-                class="w-20 h-20 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <i class="fas fa-store text-white text-3xl"></i>
-            </div>
+            @if($logo = \App\Helpers\SettingsHelper::get('logo_url'))
+                <img src="{{ $logo }}" alt="Logo" class="h-24 w-auto mx-auto mb-4 object-contain">
+            @else
+                <div
+                    class="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-store text-primary text-3xl"></i>
+                </div>
+            @endif
             <h1
-                class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
-                eCommerce Admin
+                class="text-3xl font-bold text-gray-800 mb-2 font-playfair">
+                {{ \App\Helpers\SettingsHelper::get('store_name', 'eCommerce') }}
             </h1>
-            <p class="text-gray-600">Sign in to your admin dashboard</p>
+            <p class="text-gray-500">Sign in to your admin dashboard</p>
         </div>
 
         <!-- Login Form -->

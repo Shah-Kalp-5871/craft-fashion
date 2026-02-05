@@ -33,7 +33,7 @@
                         <!-- Product Images -->
                         <div class="space-y-6">
                             <div class="relative aspect-square rounded-2xl overflow-hidden bg-white shadow-lg group">
-                                <img id="mainImage" src="{{ (isset($product['main_image']) && Str::startsWith($product['main_image'], 'http')) ? $product['main_image'] : asset('storage/' . ($product['main_image'] ?? 'images/placeholder-product.jpg')) }}"
+                                <img id="mainImage" src="{{ (isset($product['main_image']) && Str::startsWith($product['main_image'], 'http')) ? $product['main_image'] : asset('storage/' . ltrim($product['main_image'] ?? 'images/placeholder-product.jpg', '/')) }}"
                                     alt="{{ $product['name'] }}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                                 
                                 <div id="discountBadge" class="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold shadow-md {{ $product['discount_percent'] > 0 ? '' : 'hidden' }}">
@@ -51,9 +51,9 @@
                             <div id="thumbnailGallery" class="flex gap-4 overflow-x-auto pb-2 custom-scrollbar">
                                 @foreach ($product['images'] as $image)
                                     <div class="thumbnail-item flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 {{ $image['is_primary'] ? 'border-primary' : 'border-gray-200' }} cursor-pointer transition-all duration-300 hover:scale-105 hover:border-primary"
-                                        data-image="{{ Str::startsWith($image['url'], 'http') ? $image['url'] : asset('storage/' . $image['url']) }}"
+                                        data-image="{{ Str::startsWith($image['url'], 'http') ? $image['url'] : asset('storage/' . ltrim($image['url'], '/')) }}"
                                         onclick="changeMainImage(this)">
-                                        <img src="{{ Str::startsWith($image['url'], 'http') ? $image['url'] : asset('storage/' . $image['url']) }}" alt="{{ $product['name'] }}" class="w-full h-full object-cover">
+                                        <img src="{{ Str::startsWith($image['url'], 'http') ? $image['url'] : asset('storage/' . ltrim($image['url'], '/')) }}" alt="{{ $product['name'] }}" class="w-full h-full object-cover">
                                     </div>
                                 @endforeach
                             </div>
@@ -155,7 +155,7 @@
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
                                             </svg>
                                         </button>
-                                        <input type="number" id="quantity" value="1" min="1" max="10" readonly class="w-12 text-center font-bold text-gray-900 border-none focus:ring-0 bg-transparent">
+                                        <input type="number" id="quantity" value="1" min="1" max="10" oninput="handleInput(this)" onblur="handleBlur(this)" class="w-12 text-center font-bold text-gray-900 border-none focus:ring-0 bg-transparent">
                                         <button onclick="increaseQuantity()" id="increaseQty" class="p-3 text-gray-600 hover:text-primary transition-colors disabled:opacity-30">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -674,6 +674,50 @@
     function updateQuantityButtons() {
         document.getElementById('decreaseQty').disabled = currentQuantity <= 1;
         document.getElementById('increaseQty').disabled = currentQuantity >= maxQuantity;
+    }
+
+    function handleInput(input) {
+        // Allow empty string for backspacing
+        if (input.value === '') return;
+
+        let val = parseInt(input.value);
+        
+        // Ignore invalid numbers during typing
+        if (isNaN(val)) return;
+
+        // Enforce Max (prevent exceeding stock)
+        if (val > maxQuantity) {
+            val = maxQuantity;
+            input.value = val;
+            showToast(`Maximum available quantity is ${maxQuantity}`, 'error');
+        }
+
+        // Update state logic only if valid positive integer
+        if (val >= 1) {
+             currentQuantity = val;
+             updateTotalPrice();
+             updateQuantityButtons();
+        }
+    }
+
+    function handleBlur(input) {
+        let val = parseInt(input.value);
+        
+        // Enforce Min on blur (if empty or invalid)
+        if (isNaN(val) || val < 1) {
+            val = 1;
+            input.value = 1;
+        } 
+        
+        // Double check max
+        if (val > maxQuantity) {
+            val = maxQuantity;
+            input.value = maxQuantity;
+        }
+        
+        currentQuantity = val;
+        updateTotalPrice();
+        updateQuantityButtons();
     }
 
     // API Actions
