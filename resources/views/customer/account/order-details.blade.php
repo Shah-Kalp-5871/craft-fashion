@@ -8,7 +8,7 @@
         <!-- Breadcrumb -->
         <div class="mb-8">
             <nav class="flex" aria-label="Breadcrumb">
-                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3 flex-wrap">
                     <li class="inline-flex items-center">
                         <a href="{{ route('customer.home.index') }}" class="inline-flex items-center text-sm font-medium text-secondary hover:text-primary">
                             <i class="fas fa-home mr-2"></i>
@@ -43,7 +43,7 @@
                 <h1 class="text-3xl font-bold font-playfair text-dark mb-2">Order Details</h1>
                 <p class="text-secondary">Order #{{ $order->order_number }} • Placed on {{ $order->created_at->format('F j, Y h:i A') }}</p>
             </div>
-            <div class="flex gap-3">
+            <div class="flex gap-3 flex-wrap">
                 @if($order->status == 'pending' || $order->status == 'confirmed')
                     <!-- Simple Cancel Button Form -->
                     {{-- Note: Actual cancel implementation would serve a form to the 'customer.account.orders.cancel' route --}}
@@ -69,7 +69,8 @@
                 @if(!in_array($order->status, ['cancelled', 'refunded', 'returned']))
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-8">
                     <h3 class="font-bold text-lg text-dark mb-6">Order Status</h3>
-                    <div class="relative">
+                    <div class="relative overflow-x-auto pb-4">
+                        <div class="min-w-[600px] px-2 py-2">
                         <!-- Progress line -->
                         <div class="absolute top-1/2 left-0 right-0 h-1 bg-gray-100 -translate-y-1/2 z-0 rounded-full"></div>
                         @php
@@ -133,6 +134,7 @@
                                 @endif
                             </div>
                         </div>
+                        </div>
                     </div>
                 </div>
                 @else
@@ -161,11 +163,20 @@
                     </div>
                     <div class="divide-y divide-gray-100">
                         @foreach($order->items as $item)
-                        <div class="p-6 flex flex-col md:flex-row gap-6 items-start md:items-center hover:bg-gray-50 transition-colors">
+                        <div class="p-6 flex flex-col sm:flex-row gap-6 items-start sm:items-center hover:bg-gray-50 transition-colors">
                             <!-- Image -->
                             <div class="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                                @if($item->variant && $item->variant->display_image)
-                                    <img src="{{ asset('storage/' . $item->variant->display_image) }}" alt="{{ $item->product_name }}" class="w-full h-full object-cover">
+                                @php
+                                    $imageUrl = null;
+                                    if($item->variant && $item->variant->display_image) {
+                                        $imageUrl = $item->variant->display_image;
+                                    } elseif($item->product && $item->product->main_image) {
+                                        $imageUrl = asset('storage/' . $item->product->main_image);
+                                    }
+                                @endphp
+
+                                @if($imageUrl)
+                                    <img src="{{ $imageUrl }}" alt="{{ $item->product_name }}" class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full flex items-center justify-center text-gray-400">
                                         <i class="fas fa-image"></i>
@@ -191,7 +202,7 @@
                             </div>
                             
                             <!-- Price & Qty -->
-                            <div class="text-left md:text-right">
+                            <div class="text-left sm:text-right w-full sm:w-auto mt-4 sm:mt-0">
                                 <p class="text-lg font-bold text-primary">₹{{ number_format($item->unit_price, 2) }}</p>
                                 <p class="text-sm text-secondary">Qty: {{ $item->quantity }}</p>
                                 <p class="text-sm font-medium text-dark mt-1">Total: ₹{{ number_format($item->total, 2) }}</p>

@@ -67,7 +67,7 @@ class ProductController extends Controller
                 'isFeatured' => $filters['is_featured'],
                 'isNew' => $filters['is_new'],
                 'isBestseller' => $filters['is_bestseller'],
-                'title' => 'All Products - APIQO Fashion Jewelry',
+                'title' => 'All Products - ' . config('constants.SITE_NAME'),
             ]);
 
         } catch (\Exception $e) {
@@ -135,7 +135,7 @@ class ProductController extends Controller
                 'maxPrice' => $filters['max_price'],
                 'brandId' => $filters['brand_id'],
                 'inStock' => $filters['in_stock'],
-                'title' => $category->name . ' - APIQO Fashion Jewelry',
+                'title' => $category->name . ' - ' . config('constants.SITE_NAME'),
                 'meta_description' => $category->description,
             ]);
 
@@ -209,7 +209,7 @@ class ProductController extends Controller
                 'relatedProducts' => $relatedProducts,
                 'reviews' => $reviews,
                 'ratingBreakdown' => $ratingBreakdown,
-                'title' => $product['name'] . ' - APIQO Fashion Jewelry',
+                'title' => $product['name'] . ' - ' . config('constants.SITE_NAME'),
                 'meta_title' => $product['meta_title'] ?? $product['name'],
                 'meta_description' => $product['meta_description'] ?? $product['short_description'],
                 'meta_keywords' => $product['meta_keywords'] ?? null,
@@ -270,8 +270,8 @@ class ProductController extends Controller
                 'categoryId' => $filters['category_id'],
                 'brandId' => $filters['brand_id'],
                 'inStock' => $filters['in_stock'],
-                'title' => 'Search: ' . $searchQuery . ' - APIQO Fashion Jewelry',
-                'meta_description' => 'Search results for ' . $searchQuery . ' in APIQO Fashion Jewelry',
+                'title' => 'Search: ' . $searchQuery . ' - ' . config('constants.SITE_NAME'),
+                'meta_description' => 'Search results for ' . $searchQuery . ' in ' . config('constants.SITE_NAME'),
             ]);
 
         } catch (\Exception $e) {
@@ -385,7 +385,9 @@ public function rugs(Request $request)
             'isFeatured' => $filters['is_featured'],
             'isNew' => $filters['is_new'],
             'isBestseller' => $filters['is_bestseller'],
-            'title' => 'Rugs Collection - APIQO Fashion Jewelry',
+            'og_title' => 'Rugs Collection - ' . config('constants.SITE_NAME'),
+            'og_description' => 'Explore our premium collection of rugs. Find stylish, durable rugs for every room in your home.',
+            'title' => 'Rugs Collection - ' . config('constants.SITE_NAME'),
             'meta_description' => 'Explore our premium collection of rugs. Find stylish, durable rugs for every room in your home.',
             'meta_keywords' => 'rugs, carpets, home decor, floor rugs, living room rugs, bedroom rugs',
         ]);

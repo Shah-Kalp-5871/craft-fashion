@@ -521,13 +521,16 @@
         const type = document.getElementById('product_type').value;
         const simpleFields = document.getElementById('simple-product-fields');
         const configFields = document.getElementById('configurable-product-fields');
+        const mediaSection = document.getElementById('media-section');
 
         if (type === 'simple') {
             simpleFields.classList.remove('hidden');
             configFields.classList.add('hidden');
+            mediaSection.classList.remove('hidden');
         } else {
             simpleFields.classList.add('hidden');
             configFields.classList.remove('hidden');
+            mediaSection.classList.add('hidden');
             // Trigger Load Attributes if category is selected
             const catId = document.getElementById('main_category_id').value;
             if(catId) fetchAttributes(catId);
@@ -749,6 +752,7 @@
                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Variant</th>
                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-32">SKU</th>
                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-24">Price</th>
+                    <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-24">Compare</th>
                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-24">Stock</th>
                     <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-48">Images</th>
                     <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase w-16">Default</th>
@@ -760,6 +764,7 @@
 
         const baseSku = document.getElementById('sku').value || document.getElementById('product_code').value || 'SKU';
         const basePrice = document.getElementById('price').value || '';
+        const baseComparePrice = document.getElementById('compare_price').value || '';
 
         combinations.forEach((combo, idx) => {
             const variantName = combo.map(c => c.value).join(' / ');
@@ -781,11 +786,16 @@
                     <input type="number" name="variants[${idx}][price]" value="${basePrice}" step="0.01" class="w-full px-2 py-1 border rounded text-sm">
                 </td>
                 <td class="px-3 py-2">
+                    <input type="number" name="variants[${idx}][compare_price]" value="${baseComparePrice}" step="0.01" class="w-full px-2 py-1 border rounded text-sm">
+                </td>
+                <td class="px-3 py-2">
                     <input type="number" name="variants[${idx}][stock_quantity]" value="0" class="w-full px-2 py-1 border rounded text-sm">
                 </td>
                 <td class="px-3 py-2">
-                    <div id="variant-images-${idx}" class="flex gap-1 flex-wrap">
-                        <!-- Images Preview -->
+                    <div id="variant-images-${idx}" class="flex gap-1 flex-wrap items-center">
+                        <div class="relative w-10 h-10 variant-main-thumb border-2 border-dashed border-gray-300 rounded flex items-center justify-center bg-gray-50 text-xs text-gray-400">
+                             <span class="text-[0.6rem]">No Img</span>
+                        </div>
                     </div>
                     <button type="button" onclick="openVariantMediaModal(${idx})" class="text-xs text-blue-600 hover:text-blue-800 mt-1">Manage Images</button>
                     <input type="hidden" name="variants[${idx}][main_image_id]" id="variant-main-input-${idx}">
@@ -998,16 +1008,19 @@
         const container = document.getElementById(`variant-images-${idx}`);
         const input = document.getElementById(`variant-main-input-${idx}`);
 
-        // Remove existing main image thumb if any
         const existing = container.querySelector('.variant-main-thumb');
         if(existing) existing.remove();
 
         input.value = id;
 
-        // Create and prepend main image thumb
         const thumb = document.createElement('div');
-        thumb.className = 'relative w-10 h-10 variant-main-thumb border-2 border-blue-500 rounded overflow-hidden';
-        thumb.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+        thumb.className = 'relative w-10 h-10 variant-main-thumb border-2 border-blue-500 group';
+        thumb.innerHTML = `
+            <img src="${url}" class="w-full h-full object-cover">
+            <button type="button" onclick="removeVariantMainImage(${idx})" class="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl opacity-0 group-hover:opacity-100 transition text-[0.6rem] leading-none">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        `;
         container.prepend(thumb);
     }
 
@@ -1026,12 +1039,18 @@
         input.type = 'hidden';
         input.name = `variants[${idx}][gallery_image_ids][]`;
         input.value = id;
+        input.id = `v-gallery-${idx}-${id}`;
         hiddenContainer.appendChild(input);
 
         // Add Thumb
         const thumb = document.createElement('div');
-        thumb.className = 'relative w-10 h-10 border border-gray-200 rounded overflow-hidden';
-        thumb.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+        thumb.className = 'relative w-10 h-10 border border-gray-200 rounded overflow-hidden group';
+        thumb.innerHTML = `
+            <img src="${url}" class="w-full h-full object-cover">
+            <button type="button" onclick="this.parentElement.remove(); removeVariantGalleryInput(${idx}, ${id})" class="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl opacity-0 group-hover:opacity-100 transition text-[0.6rem] leading-none">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        `;
         container.appendChild(thumb);
     }
 
@@ -1055,6 +1074,22 @@
     }
 
     // =============== FILE UPLOAD FUNCTIONS ===============
+
+    function removeVariantMainImage(idx) {
+        document.getElementById(`variant-main-input-${idx}`).value = '';
+        const container = document.getElementById(`variant-images-${idx}`);
+        const thumb = container.querySelector('.variant-main-thumb');
+        
+        if (thumb) {
+            thumb.className = 'relative w-10 h-10 variant-main-thumb border-2 border-dashed border-gray-300 rounded flex items-center justify-center bg-gray-50 text-xs text-gray-400';
+            thumb.innerHTML = '<span class="text-[0.6rem]">No Img</span>';
+        }
+    }
+
+    function removeVariantGalleryInput(idx, imgId) {
+        const input = document.getElementById(`v-gallery-${idx}-${imgId}`);
+        if(input) input.remove();
+    }
 
     async function handleFileUpload(event) {
         const files = event.target.files;

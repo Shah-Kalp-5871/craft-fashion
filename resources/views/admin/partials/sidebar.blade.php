@@ -21,20 +21,20 @@ $navItems = [
                 'title' => 'Add New',
                 'route' => 'admin.products.create',
             ],
-            'attributes' => [
-                'title' => 'Attributes',
-                'route' => 'admin.products.attributes',
-                'params' => ['id' => 1],
-            ],
-            'specs' => [
-                'title' => 'Specifications',
-                'route' => 'admin.products.specifications',
-                'params' => ['id' => 1],
-            ],
-            'tags' => [
-                'title' => 'Tags',
-                'route' => 'admin.products.tags',
-            ],
+            // 'attributes' => [
+            //     'title' => 'Attributes',
+            //     'route' => 'admin.products.attributes',
+            //     'params' => ['id' => 1],
+            // ],
+            // 'specs' => [
+            //     'title' => 'Specifications',
+            //     'route' => 'admin.products.specifications',
+            //     'params' => ['id' => 1],
+            // ],
+            // 'tags' => [
+            //     'title' => 'Tags',
+            //     'route' => 'admin.products.tags',
+            // ],
         ],
     ],
 
@@ -167,11 +167,11 @@ $navItems = [
         ],
     ],
 
-    // 'pages' => [
-    //     'title' => 'Pages',
-    //     'icon' => 'fas fa-file-alt',
-    //     'route' => 'admin.pages.index',
-    // ],
+    'pages' => [
+        'title' => 'Pages',
+        'icon' => 'fas fa-file-alt',
+        'route' => 'admin.pages.index',
+    ],
 
     'reviews' => [
         'title' => 'Reviews',
@@ -217,11 +217,7 @@ $isActive = function ($route, $params = []) use ($currentRoute) {
                         <i class="fas fa-store text-primary text-lg"></i>
                     </div>
                 @endif
-                <span
-                    class="text-xl font-bold text-primary transition-all duration-300
-                             text-expandable whitespace-nowrap">
-                    {{ \App\Helpers\SettingsHelper::get('store_name', 'Craft Fashion') }}
-                </span>
+
             </div>
             <button id="sidebarClose" class="text-gray-500 hover:text-gray-700 md:hidden">
                 <i class="fas fa-times text-xl"></i>

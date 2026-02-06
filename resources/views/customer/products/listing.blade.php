@@ -64,11 +64,29 @@
     <div class="container mx-auto px-4 py-8">
         <div class="flex flex-col lg:flex-row gap-8">
             <!-- Sidebar Filters -->
-            <aside class="lg:w-1/4">
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
+            <aside id="filterSidebar" class="fixed inset-0 z-50 bg-white/95 backdrop-blur-sm p-6 overflow-y-auto hidden lg:block lg:static lg:w-1/4 lg:p-0 lg:bg-transparent lg:shadow-none lg:z-auto transition-all duration-300">
+                <style>
+                    /* Mobile Drawer Styles */
+                    @media (max-width: 1024px) {
+                        #filterSidebar.active {
+                            display: block;
+                            animation: slideIn 0.3s ease-out;
+                        }
+                        @keyframes slideIn {
+                            from { transform: translateX(-100%); opacity: 0; }
+                            to { transform: translateX(0); opacity: 1; }
+                        }
+                    }
+                </style>
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24 h-full lg:h-auto overflow-y-auto lg:overflow-visible">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-lg font-bold text-dark">Filters</h3>
-                        <a href="{{ route('customer.products.list') }}" class="text-xs text-primary hover:underline">Reset All</a>
+                        <div class="flex items-center gap-4">
+                            <a href="{{ route('customer.products.list') }}" class="text-xs text-primary hover:underline">Reset All</a>
+                            <button onclick="toggleFilters()" class="lg:hidden text-gray-500 hover:text-red-500 transition-colors">
+                                <i class="fas fa-times text-xl"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <form id="filterForm" action="{{ route('customer.products.list') }}" method="GET">
@@ -220,19 +238,22 @@
 
             <!-- Product Grid Area -->
             <main class="lg:w-3/4">
-                <!-- Sorting & Results Header -->
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-4 rounded-2xl border border-gray-100 shadow-sm mb-8 gap-4">
-                    <div>
-                        <p class="text-gray-500 text-sm">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center bg-white p-4 rounded-2xl border border-gray-100 shadow-sm mb-8 gap-4 sticky top-0 md:static z-40">
+                    <div class="flex items-center justify-between w-full md:w-auto gap-4">
+                        <button onclick="toggleFilters()" class="lg:hidden flex items-center gap-2 px-4 py-2 bg-dark text-white rounded-xl text-sm font-medium hover:bg-primary transition-colors shadow-sm">
+                            <i class="fas fa-filter"></i> Filters
+                        </button>
+                        
+                        <p class="text-gray-500 text-sm hidden md:block">
                             Showing <span class="text-dark font-bold font-poppins">{{ $paginator['from'] ?? 0 }}-{{ $paginator['to'] ?? 0 }}</span> 
                             of <span class="text-dark font-bold">{{ $paginator['total'] ?? 0 }}</span> results
                         </p>
                     </div>
                     
-                    <div class="flex items-center gap-3">
-                        <label class="text-sm text-gray-500 whitespace-nowrap">Sort by:</label>
+                    <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                        <label class="text-sm text-gray-500 whitespace-nowrap hidden sm:block">Sort by:</label>
                         <select id="sortBySelect" onchange="updateSorting(this.value)"
-                            class="bg-gray-50 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 text-dark font-medium cursor-pointer">
+                            class="bg-gray-50 border-none rounded-xl px-4 py-2 text-sm focus:ring-2 focus:ring-primary/20 text-dark font-medium cursor-pointer w-full sm:w-auto">
                             <option value="newest" {{ ($sortBy ?? 'newest') == 'newest' ? 'selected' : '' }}>Newest Arrival</option>
                             <option value="price_asc" {{ ($sortBy ?? '') == 'price_asc' ? 'selected' : '' }}>Price: Low to High</option>
                             <option value="price_desc" {{ ($sortBy ?? '') == 'price_desc' ? 'selected' : '' }}>Price: High to Low</option>
@@ -402,6 +423,20 @@
             url.searchParams.delete(name);
             url.searchParams.set('page', 1);
             window.location.href = url.href;
+        };
+
+        // Mobile Filter Toggle
+        window.toggleFilters = function() {
+            const sidebar = document.getElementById('filterSidebar');
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('active');
+            
+            // Prevent body scroll when menu is open
+            if (!sidebar.classList.contains('hidden')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
         };
     });
 </script>

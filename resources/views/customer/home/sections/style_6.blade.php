@@ -8,7 +8,7 @@
                 @endif
                 <h2 class="text-3xl md:text-4xl font-bold font-playfair text-dark">{{ $section['title'] }}</h2>
             </div>
-            <a href="#" class="hidden md:inline-flex items-center text-dark font-bold hover:text-primary transition-colors">
+            <a href="{{ route('customer.products.list') }}" class="hidden md:inline-flex items-center text-dark font-bold hover:text-primary transition-colors">
                 View Collection <i class="fas fa-arrow-right ml-2"></i>
             </a>
         </div>
@@ -38,7 +38,7 @@
         </div>
         
          <div class="text-center mt-8 md:hidden">
-            <a href="#" class="inline-flex items-center text-dark font-bold hover:text-primary transition-colors">
+            <a href="{{ route('customer.products.list') }}" class="inline-flex items-center text-dark font-bold hover:text-primary transition-colors">
                 View Collection <i class="fas fa-arrow-right ml-2"></i>
             </a>
         </div>

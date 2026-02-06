@@ -112,8 +112,17 @@
                                         @foreach($order->items->take(2) as $item)
                                             <div class="flex items-center gap-4">
                                                 <div class="flex-shrink-0">
-                                                    @if($item->variant && $item->variant->display_image)
-                                                        <img src="{{ $item->variant->display_image }}" alt="{{ $item->product_name }}" 
+                                                    @php
+                                                        $orderImageUrl = null;
+                                                        if($item->variant && $item->variant->display_image) {
+                                                            $orderImageUrl = $item->variant->display_image;
+                                                        } elseif($item->product && $item->product->main_image) {
+                                                            $orderImageUrl = asset('storage/' . $item->product->main_image);
+                                                        }
+                                                    @endphp
+
+                                                    @if($orderImageUrl)
+                                                        <img src="{{ $orderImageUrl }}" alt="{{ $item->product_name }}" 
                                                              class="w-16 h-16 object-cover rounded-lg shadow-sm">
                                                     @else
                                                         <div class="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center text-gray-400">

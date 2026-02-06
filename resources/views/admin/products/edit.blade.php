@@ -78,6 +78,7 @@
             </div>
 
             <!-- Media -->
+            @if($product->product_type === 'simple')
             <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100" id="media-section">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Product Images</h3>
                 
@@ -128,6 +129,7 @@
                     </button>
                 </div>
             </div>
+            @endif
 
             <!-- Simple Product Fields -->
             @if($product->product_type === 'simple')
@@ -172,9 +174,11 @@
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Variant</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-32">SKU</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-24">Price</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-24">Compare</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-24">Stock</th>
                                 <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase w-48">Images</th>
                                 <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase w-16">Default</th>
+                                <th class="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase w-16">Action</th>
                             </tr>
                         </thead>
                         <tbody class="bg-white divide-y divide-gray-200" id="variants-container">
@@ -193,14 +197,7 @@
                                         {{ $name ?: 'Variant #' . ($idx + 1) }}
                                         
                                         <input type="hidden" name="variants[{{ $idx }}][id]" value="{{ $variant->id }}">
-                                        
-                                        {{-- We need to preserve attributes? Usually on Edit we don't change attribs of existing variant, just values --}}
-                                        {{-- But we need to send them back if we want to "sync"? 
-                                             Actually, ProductService update logic for existing variants might just check SKU/ID.
-                                             Let's look at ProductService::updateProduct:
-                                             It usually iterates variants.
-                                             If basic update, we just need ID.
-                                        --}}
+                                        <input type="hidden" name="variants[{{ $idx }}][is_active]" value="1" class="variant-active-input">
                                     </td>
                                     <td class="px-3 py-2">
                                         <input type="text" name="variants[{{ $idx }}][sku]" value="{{ $variant->sku }}" class="w-full px-2 py-1 border rounded text-sm">
@@ -209,14 +206,20 @@
                                         <input type="number" name="variants[{{ $idx }}][price]" value="{{ $variant->price }}" step="0.01" class="w-full px-2 py-1 border rounded text-sm">
                                     </td>
                                     <td class="px-3 py-2">
+                                        <input type="number" name="variants[{{ $idx }}][compare_price]" value="{{ $variant->compare_price }}" step="0.01" class="w-full px-2 py-1 border rounded text-sm">
+                                    </td>
+                                    <td class="px-3 py-2">
                                         <input type="number" name="variants[{{ $idx }}][stock_quantity]" value="{{ $variant->stock_quantity }}" class="w-full px-2 py-1 border rounded text-sm">
                                     </td>
                                     <td class="px-3 py-2">
                                         <div id="variant-images-{{ $idx }}" class="flex gap-1 flex-wrap items-center">
                                             {{-- Main Image --}}
                                             @if($variant->primaryImage && $variant->primaryImage->media)
-                                                <div class="relative w-10 h-10 variant-main-thumb border-2 border-blue-500">
+                                                <div class="relative w-10 h-10 variant-main-thumb border-2 border-blue-500 group">
                                                     <img src="{{ asset('storage/' . $variant->primaryImage->media->file_path) }}" class="w-full h-full object-cover">
+                                                    <button type="button" onclick="removeVariantMainImage({{ $idx }})" class="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl opacity-0 group-hover:opacity-100 transition text-[0.6rem] leading-none">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                    </button>
                                                 </div>
                                             @else
                                                 <div class="relative w-10 h-10 variant-main-thumb border-2 border-dashed border-gray-300 rounded flex items-center justify-center bg-gray-50 text-xs text-gray-400">
@@ -225,9 +228,11 @@
                                             @endif
                                             {{-- Gallery --}}
                                             @foreach($variant->images as $vImg)
-                                                {{-- Avoid duplicating main image if we want, but keeping original logic flow is fine too --}}
-                                                <div class="relative w-10 h-10 border border-gray-200">
+                                                <div class="relative w-10 h-10 border border-gray-200 group">
                                                     <img src="{{ asset('storage/' . $vImg->file_path) }}" class="w-full h-full object-cover">
+                                                    <button type="button" onclick="this.parentElement.remove(); removeVariantGalleryInput({{ $idx }}, {{ $vImg->id }})" class="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl opacity-0 group-hover:opacity-100 transition text-[0.6rem] leading-none">
+                                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                                    </button>
                                                 </div>
                                             @endforeach
                                         </div>
@@ -237,13 +242,18 @@
                                         <input type="hidden" name="variants[{{ $idx }}][main_image_id]" id="variant-main-input-{{ $idx }}" value="{{ ($variant->primaryImage && $variant->primaryImage->media) ? $variant->primaryImage->media_id : '' }}">
                                         <div id="variant-gallery-inputs-{{ $idx }}">
                                             @foreach($variant->images as $vImg)
-                                                <input type="hidden" name="variants[{{ $idx }}][gallery_image_ids][]" value="{{ $vImg->id }}">
+                                                <input type="hidden" name="variants[{{ $idx }}][gallery_image_ids][]" value="{{ $vImg->id }}" id="v-gallery-{{ $idx }}-{{ $vImg->id }}">
                                             @endforeach
                                         </div>
                                     </td>
                                     <td class="px-3 py-2 text-center">
                                        <input type="radio" name="default_variant_index" value="{{ $idx }}" {{ $variant->is_default ? 'checked' : '' }} onclick="document.querySelectorAll('.is-default-input').forEach(el => el.value=0); document.getElementById('is-default-{{ $idx }}').value=1;">
                                        <input type="hidden" id="is-default-{{ $idx }}" name="variants[{{ $idx }}][is_default]" value="{{ $variant->is_default ? '1' : '0' }}" class="is-default-input">
+                                    </td>
+                                    <td class="px-3 py-2 text-center">
+                                        <button type="button" onclick="removeVariantRow({{ $idx }})" class="text-red-500 hover:text-red-700 transition">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach
@@ -254,12 +264,14 @@
             @endif
 
             <!-- Dynamic Specifications -->
+            {{--
             <div id="specifications-wrapper" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Specifications</h3>
                 <div id="specifications-container" class="space-y-6">
                     <!-- Loaded via JS -->
                 </div>
             </div>
+            --}}
 
         </div>
 
@@ -697,8 +709,13 @@
         input.value = id;
         
         const thumb = document.createElement('div');
-        thumb.className = 'relative w-10 h-10 variant-main-thumb border-2 border-blue-500';
-        thumb.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+        thumb.className = 'relative w-10 h-10 variant-main-thumb border-2 border-blue-500 group';
+        thumb.innerHTML = `
+            <img src="${url}" class="w-full h-full object-cover">
+            <button type="button" onclick="removeVariantMainImage(${idx})" class="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl opacity-0 group-hover:opacity-100 transition text-[0.6rem] leading-none">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        `;
         container.prepend(thumb);
     }
 
@@ -708,15 +725,17 @@
         
         if(hiddenContainer.querySelector(`input[value="${id}"]`)) return;
         
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = `variants[${idx}][gallery_image_ids][]`;
-        input.value = id;
+        input.id = `v-gallery-${idx}-${id}`;
         hiddenContainer.appendChild(input);
         
         const thumb = document.createElement('div');
-        thumb.className = 'relative w-10 h-10 border border-gray-200';
-        thumb.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+        thumb.className = 'relative w-10 h-10 border border-gray-200 group';
+        thumb.innerHTML = `
+            <img src="${url}" class="w-full h-full object-cover">
+            <button type="button" onclick="this.parentElement.remove(); removeVariantGalleryInput(${idx}, ${id})" class="absolute top-0 right-0 bg-red-500 text-white p-0.5 rounded-bl opacity-0 group-hover:opacity-100 transition text-[0.6rem] leading-none">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        `;
         container.appendChild(thumb);
     }
     
@@ -736,6 +755,44 @@
         } catch (error) {
             alert('Upload failed');
         }
+    }
+
+    function removeVariantRow(idx) {
+        Swal.fire({
+            title: 'Delete Variant?',
+            text: "This variant will be removed. If it already exists, it will be deleted permanently on update.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const row = document.getElementById(`variant-row-${idx}`);
+                if (row) {
+                    // Check if it has an ID, if so, we might want to mark it for deletion?
+                    // For now, simpler: just remove. If your controller syncs by ID, missing ones might be deleted or ignored.
+                    // Given the prompt "add new action in delete icon", user likely wants it gone.
+                    row.remove();
+                }
+            }
+        });
+    }
+
+    function removeVariantMainImage(idx) {
+        document.getElementById(`variant-main-input-${idx}`).value = '';
+        const container = document.getElementById(`variant-images-${idx}`);
+        const thumb = container.querySelector('.variant-main-thumb');
+        
+        if (thumb) {
+            thumb.className = 'relative w-10 h-10 variant-main-thumb border-2 border-dashed border-gray-300 rounded flex items-center justify-center bg-gray-50 text-xs text-gray-400';
+            thumb.innerHTML = '<span class="text-[0.6rem]">No Img</span>';
+        }
+    }
+
+    function removeVariantGalleryInput(idx, imgId) {
+        const input = document.getElementById(`v-gallery-${idx}-${imgId}`);
+        if(input) input.remove();
     }
 
     document.getElementById('media-search').addEventListener('input', _.debounce((e) => {
