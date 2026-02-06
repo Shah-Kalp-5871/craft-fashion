@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Model;
  */
 class CategoryHierarchy extends Model
 {
+    public $timestamps = false;
+
     protected $fillable = [
         'ancestor_id',
         'descendant_id',

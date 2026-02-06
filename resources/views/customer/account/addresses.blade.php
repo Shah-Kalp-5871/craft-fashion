@@ -138,73 +138,100 @@
     <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         
         <!-- Background overlay -->
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeAddressModal()"></div>
+        <div class="fixed inset-0 bg-dark/50 backdrop-blur-sm transition-opacity" aria-hidden="true" onclick="closeAddressModal()"></div>
 
         <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
 
-        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
-            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                <div class="flex justify-between items-center mb-5">
-                    <h3 class="text-lg leading-6 font-bold text-dark" id="modal-title">Add New Address</h3>
-                    <button onclick="closeAddressModal()" class="text-gray-400 hover:text-gray-500 focus:outline-none">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-                
+        <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full border border-gray-100">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-dark to-primary px-6 py-4 flex justify-between items-center text-white">
+                <h3 class="text-xl font-playfair font-bold" id="modal-title">Add New Address</h3>
+                <button onclick="closeAddressModal()" class="text-white/80 hover:text-white transition focus:outline-none bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="px-6 py-6">
                 <form id="addressForm" action="{{ route('customer.account.addresses.store') }}" method="POST">
                     @csrf
                     <div id="method_field"></div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <div class="col-span-2 md:col-span-1">
-                            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                            <input type="text" name="name" id="name" required class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring focus:ring-primary/20 transition shadow-sm text-sm" placeholder="John Doe">
+                            <label for="name" class="block text-sm font-medium text-dark mb-1.5">Full Name</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                    <i class="far fa-user"></i>
+                                </span>
+                                <input type="text" name="name" id="name" required class="w-full pl-10 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition duration-200 text-sm" placeholder="John Doe">
+                            </div>
                         </div>
                         <div class="col-span-2 md:col-span-1">
-                            <label for="mobile" class="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
-                            <input type="text" name="mobile" id="mobile" required maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring focus:ring-primary/20 transition shadow-sm text-sm" placeholder="9876543210">
+                            <label for="mobile" class="block text-sm font-medium text-dark mb-1.5">Mobile Number</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                    <i class="fas fa-phone"></i>
+                                </span>
+                                <input type="text" name="mobile" id="mobile" required maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" class="w-full pl-10 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition duration-200 text-sm" placeholder="9876543210">
+                            </div>
                         </div>
                         <div class="col-span-2">
-                             <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address Detail</label>
-                             <textarea name="address" id="address" rows="2" required class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring focus:ring-primary/20 transition shadow-sm text-sm" placeholder="Flat No, Building, Street"></textarea>
+                             <label for="address" class="block text-sm font-medium text-dark mb-1.5">Address Detail</label>
+                             <div class="relative">
+                                <span class="absolute top-3 left-3 text-gray-400">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </span>
+                                <textarea name="address" id="address" rows="3" required class="w-full pl-10 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition duration-200 text-sm resize-none" placeholder="Flat No, Building, Street, Area"></textarea>
+                             </div>
                         </div>
                         <div class="col-span-2 md:col-span-1">
-                            <label for="pincode" class="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
-                            <input type="text" name="pincode" id="pincode" required maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6)" class="w-full rounded-lg border-gray-300 focus:border-primary focus:ring focus:ring-primary/20 transition shadow-sm text-sm" placeholder="123456">
+                            <label for="pincode" class="block text-sm font-medium text-dark mb-1.5">Pincode</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                                    <i class="fas fa-map-pin"></i>
+                                </span>
+                                <input type="text" name="pincode" id="pincode" required maxlength="6" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6)" class="w-full pl-10 px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl focus:border-primary focus:ring-2 focus:ring-primary/20 transition duration-200 text-sm" placeholder="123456">
+                            </div>
                         </div>
                         
                         <div class="col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Address Type</label>
-                            <div class="flex gap-4">
-                                <label class="flex items-center">
-                                    <input type="radio" name="type" value="shipping" class="text-primary focus:ring-primary" checked>
-                                    <span class="ml-2 text-sm text-gray-600">Home/Shipping</span>
+                            <label class="block text-sm font-medium text-dark mb-3">Address Type</label>
+                            <div class="flex flex-wrap gap-4">
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="type" value="shipping" class="peer sr-only" checked>
+                                    <div class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-600 peer-checked:bg-primary/10 peer-checked:text-primary peer-checked:border-primary transition-all flex items-center text-sm font-medium hover:bg-gray-50">
+                                        <i class="fas fa-home mr-2"></i> Home
+                                    </div>
                                 </label>
-                                <label class="flex items-center">
-                                    <input type="radio" name="type" value="billing" class="text-primary focus:ring-primary">
-                                    <span class="ml-2 text-sm text-gray-600">Work/Billing</span>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="type" value="billing" class="peer sr-only">
+                                    <div class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-600 peer-checked:bg-primary/10 peer-checked:text-primary peer-checked:border-primary transition-all flex items-center text-sm font-medium hover:bg-gray-50">
+                                        <i class="fas fa-building mr-2"></i> Work
+                                    </div>
                                 </label>
-                                <label class="flex items-center">
-                                    <input type="radio" name="type" value="both" class="text-primary focus:ring-primary">
-                                    <span class="ml-2 text-sm text-gray-600">Both</span>
+                                <label class="cursor-pointer">
+                                    <input type="radio" name="type" value="both" class="peer sr-only">
+                                    <div class="px-4 py-2 rounded-lg border border-gray-200 bg-white text-gray-600 peer-checked:bg-primary/10 peer-checked:text-primary peer-checked:border-primary transition-all flex items-center text-sm font-medium hover:bg-gray-50">
+                                        <i class="fas fa-map mr-2"></i> Both
+                                    </div>
                                 </label>
                             </div>
                         </div>
                         
                         <div class="col-span-2">
-                            <label class="flex items-center">
-                                <input type="checkbox" name="is_default" id="is_default" class="rounded border-gray-300 text-primary focus:ring-primary" value="1">
-                                <span class="ml-2 text-sm text-gray-600">Make this my default address</span>
+                            <label class="flex items-center cursor-pointer group">
+                                <input type="checkbox" name="is_default" id="is_default" class="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary transition cursor-pointer" value="1">
+                                <span class="ml-2 text-sm text-secondary group-hover:text-dark transition">Make this my default address</span>
                             </label>
                         </div>
                     </div>
 
-                    <div class="mt-8 flex justify-end gap-3">
-                         <button type="button" onclick="closeAddressModal()" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-200 transition">
+                    <div class="mt-8 flex justify-end gap-3 pt-6 border-t border-gray-100">
+                         <button type="button" onclick="closeAddressModal()" class="px-6 py-2.5 rounded-xl text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-dark transition">
                             Cancel
                         </button>
-                        <button type="submit" class="bg-primary text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-primary/90 transition shadow-sm">
-                            Save Address
+                        <button type="submit" class="bg-gradient-to-r from-dark to-primary text-white px-8 py-2.5 rounded-xl text-sm font-bold shadow-lg hover:shadow-xl hover:scale-[1.02] transition-all duration-300 flex items-center">
+                            Save Address <i class="fas fa-check ml-2"></i>
                         </button>
                     </div>
                 </form>

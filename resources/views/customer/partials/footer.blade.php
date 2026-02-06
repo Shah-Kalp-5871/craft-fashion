@@ -2,12 +2,12 @@
     <div class="container mx-auto px-4">
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div>
-                <h3 class="text-2xl font-playfair font-bold mb-4">{{ config('constants.SITE_NAME') }}</h3>
-                <p class="mb-4">Premium clothing for women, girls, and kids in Yamuna Nagar.</p>
+                <h3 class="text-2xl font-playfair font-bold mb-4">{{ \App\Helpers\SettingsHelper::get('store_name', config('constants.SITE_NAME')) }}</h3>
+                <p class="mb-4">{{ \App\Helpers\SettingsHelper::get('store_description', 'Premium clothing for women, girls, and kids in Yamuna Nagar.') }}</p>
                 <div class="flex space-x-4">
-                    <a href="#" class="text-white hover:text-primary transition"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" class="text-white hover:text-primary transition"><i class="fab fa-instagram"></i></a>
-                    <a href="{{ config('constants.WHATSAPP_LINK') }}" class="text-white hover:text-primary transition"><i class="fab fa-whatsapp"></i></a>
+                    <a href="{{ \App\Helpers\SettingsHelper::get('social_facebook', config('constants.SOCIAL.facebook')) }}" class="text-white hover:text-primary transition"><i class="fab fa-facebook-f"></i></a>
+                    <a href="{{ \App\Helpers\SettingsHelper::get('social_instagram', config('constants.SOCIAL.instagram')) }}" class="text-white hover:text-primary transition"><i class="fab fa-instagram"></i></a>
+                    <a href="{{ \App\Helpers\SettingsHelper::get('social_whatsapp', config('constants.WHATSAPP_LINK')) }}" class="text-white hover:text-primary transition"><i class="fab fa-whatsapp"></i></a>
                 </div>
             </div>
             
@@ -26,22 +26,22 @@
                 <ul class="space-y-2">
                     <li class="flex items-start">
                         <i class="fas fa-map-marker-alt mt-1 mr-2"></i>
-                        <span>{{ config('constants.SITE_ADDRESS') . ', ' . config('constants.SITE_PINCODE') }}</span>
+                        <span>{{ \App\Helpers\SettingsHelper::get('store_address', config('constants.SITE_ADDRESS')) . ', ' . \App\Helpers\SettingsHelper::get('store_pincode', config('constants.SITE_PINCODE')) }}</span>
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-phone-alt mr-2"></i>
-                        <a href="tel:{{ config('constants.SITE_PHONE') }}" class="hover:text-primary transition">{{ config('constants.SITE_PHONE') }}</a>
+                        <a href="tel:{{ \App\Helpers\SettingsHelper::get('store_phone', config('constants.SITE_PHONE')) }}" class="hover:text-primary transition">{{ \App\Helpers\SettingsHelper::get('store_phone', config('constants.SITE_PHONE')) }}</a>
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-envelope mr-2"></i>
-                        <a href="mailto:info@craftfashion.com" class="hover:text-primary transition">info@craftfashion.com</a>
+                        <a href="mailto:{{ \App\Helpers\SettingsHelper::get('store_email', config('constants.SITE_EMAIL')) }}" class="hover:text-primary transition">{{ \App\Helpers\SettingsHelper::get('store_email', config('constants.SITE_EMAIL')) }}</a>
                     </li>
                 </ul>
             </div>
         </div>
         
         <div class="border-t border-secondary mt-8 pt-8 text-center text-sm">
-            <p>&copy; {{ date('Y') }} {{ config('constants.SITE_NAME') }}. All Rights Reserved.</p>
+            <p>&copy; {{ date('Y') }} {{ \App\Helpers\SettingsHelper::get('store_name', config('constants.SITE_NAME')) }}. All Rights Reserved.</p>
             <div class="mt-2">
                 <a href="{{ route('customer.page.privacy') }}" class="hover:text-primary transition">Privacy Policy</a> | 
                 <a href="{{ route('customer.page.terms') }}" class="hover:text-primary transition">Terms & Conditions</a>

@@ -225,35 +225,10 @@
                                     </button>
                                 </div>
                                 
-                                <!-- Password Strength Indicator -->
-                                <div class="mt-2">
-                                    <div class="password-strength rounded-full" id="passwordStrength"></div>
-                                    <div class="text-xs text-gray-500 mt-1" id="passwordStrengthText"></div>
-                                </div>
+
                                 
                                 <!-- Password Requirements -->
-                                <div class="password-requirements mt-3 space-y-1" id="passwordRequirements">
-                                    <div class="flex items-center">
-                                        <i class="fas fa-circle text-xs mr-2 requirement-unmet" id="reqLength"></i>
-                                        <span>At least 8 characters</span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <i class="fas fa-circle text-xs mr-2 requirement-unmet" id="reqUppercase"></i>
-                                        <span>One uppercase letter</span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <i class="fas fa-circle text-xs mr-2 requirement-unmet" id="reqLowercase"></i>
-                                        <span>One lowercase letter</span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <i class="fas fa-circle text-xs mr-2 requirement-unmet" id="reqNumber"></i>
-                                        <span>One number</span>
-                                    </div>
-                                    <div class="flex items-center">
-                                        <i class="fas fa-circle text-xs mr-2 requirement-unmet" id="reqSpecial"></i>
-                                        <span>One special character</span>
-                                    </div>
-                                </div>
+
                                 
                                 @error('password')
                                     <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
@@ -433,58 +408,7 @@
         }
     }
 
-    // Password strength checker
-    function checkPasswordStrength(password) {
-        let strength = 0;
-        const requirements = {
-            length: password.length >= 8,
-            uppercase: /[A-Z]/.test(password),
-            lowercase: /[a-z]/.test(password),
-            number: /[0-9]/.test(password),
-            special: /[^A-Za-z0-9]/.test(password)
-        };
 
-        // Update requirement icons
-        Object.keys(requirements).forEach(req => {
-            const icon = document.getElementById(`req${req.charAt(0).toUpperCase() + req.slice(1)}`);
-            if (icon) {
-                if (requirements[req]) {
-                    icon.classList.remove('requirement-unmet');
-                    icon.classList.add('requirement-met');
-                    icon.classList.remove('fa-circle');
-                    icon.classList.add('fa-check-circle');
-                    strength++;
-                } else {
-                    icon.classList.remove('requirement-met');
-                    icon.classList.add('requirement-unmet');
-                    icon.classList.remove('fa-check-circle');
-                    icon.classList.add('fa-circle');
-                }
-            }
-        });
-
-        // Update strength indicator
-        const strengthBar = document.getElementById('passwordStrength');
-        const strengthText = document.getElementById('passwordStrengthText');
-        
-        if (strength <= 1) {
-            strengthBar.className = 'password-strength strength-weak';
-            strengthText.textContent = 'Weak password';
-            strengthText.className = 'text-xs text-red-600 mt-1';
-        } else if (strength <= 3) {
-            strengthBar.className = 'password-strength strength-fair';
-            strengthText.textContent = 'Fair password';
-            strengthText.className = 'text-xs text-yellow-600 mt-1';
-        } else if (strength === 4) {
-            strengthBar.className = 'password-strength strength-good';
-            strengthText.textContent = 'Good password';
-            strengthText.className = 'text-xs text-green-600 mt-1';
-        } else {
-            strengthBar.className = 'password-strength strength-strong';
-            strengthText.textContent = 'Strong password!';
-            strengthText.className = 'text-xs text-green-600 mt-1 font-semibold';
-        }
-    }
 
     // Check password match
     function checkPasswordMatch() {
@@ -518,8 +442,8 @@
     });
 
     // Real-time password validation
+    // Real-time password validation
     document.getElementById('password').addEventListener('input', function(e) {
-        checkPasswordStrength(e.target.value);
         checkPasswordMatch();
     });
 
@@ -558,10 +482,10 @@
         }
         
         // Password validation
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-        if (!passwordRegex.test(password)) {
+        // Password validation (Simple length check only)
+        if (password.length < 8) {
             isValid = false;
-            errorMessage = 'Password must contain at least 8 characters, one uppercase, one lowercase, one number and one special character';
+            errorMessage = 'Password must be at least 8 characters';
         }
         
         // Password match
@@ -609,8 +533,17 @@
     document.addEventListener('DOMContentLoaded', function() {
         const password = document.getElementById('password').value;
         if (password) {
-            checkPasswordStrength(password);
+
             checkPasswordMatch();
+        }
+    });
+
+    // Reset button state when page is restored from bfcache
+    window.addEventListener('pageshow', function(event) {
+        const submitBtn = document.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.innerHTML = '<span>Create Account</span><i class="fas fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>';
+            submitBtn.disabled = false;
         }
     });
 </script>

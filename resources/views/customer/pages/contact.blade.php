@@ -45,8 +45,8 @@
                             </div>
                             <div>
                                 <h3 class="text-lg font-semibold text-dark mb-2">Visit Our Boutique</h3>
-                                <p class="text-secondary mb-1">{{ config('constants.SITE_ADDRESS') }}</p>
-                                <p class="text-secondary">Yamuna Nagar, {{ config('constants.SITE_PINCODE') }}</p>
+                                <p class="text-secondary mb-1">{{ \App\Helpers\SettingsHelper::get('store_address', config('constants.SITE_ADDRESS')) }}</p>
+                                <p class="text-secondary">Yamuna Nagar, {{ \App\Helpers\SettingsHelper::get('store_pincode', config('constants.SITE_PINCODE')) }}</p>
                                 <a href="#map-section"
                                     class="text-primary text-sm font-medium mt-2 inline-flex items-center hover:underline">
                                     <i class="fas fa-directions mr-1"></i> Get Directions
@@ -61,8 +61,8 @@
                             </div>
                             <div>
                                 <h3 class="text-lg font-semibold text-dark mb-2">Call Us</h3>
-                                <a href="tel:{{ config('constants.SITE_PHONE') }}"
-                                    class="text-secondary text-lg font-medium hover:text-primary transition">{{ config('constants.SITE_PHONE') }}</a>
+                                <a href="tel:{{ \App\Helpers\SettingsHelper::get('store_phone', config('constants.SITE_PHONE')) }}"
+                                    class="text-secondary text-lg font-medium hover:text-primary transition">{{ \App\Helpers\SettingsHelper::get('store_phone', config('constants.SITE_PHONE')) }}</a>
                                 <p class="text-secondary text-sm mt-1">Mon-Sat: 10AM-8PM | Sun: 11AM-6PM</p>
                             </div>
                         </div>
@@ -90,8 +90,8 @@
                             </div>
                             <div>
                                 <h3 class="text-lg font-semibold text-dark mb-2">Email Us</h3>
-                                <a href="mailto:info@craftfashion.com"
-                                    class="text-secondary hover:text-primary transition">info@craftfashion.com</a>
+                                <a href="mailto:{{ \App\Helpers\SettingsHelper::get('store_email', config('constants.SITE_EMAIL')) }}"
+                                    class="text-secondary hover:text-primary transition">{{ \App\Helpers\SettingsHelper::get('store_email', config('constants.SITE_EMAIL')) }}</a>
                                 <p class="text-secondary text-sm mt-1">We'll respond within 24 hours</p>
                             </div>
                         </div>
@@ -101,15 +101,15 @@
                     <div class="mt-12 pt-8 border-t border-gray-200">
                         <h3 class="text-lg font-semibold text-dark mb-4">Follow Our Journey</h3>
                         <div class="flex space-x-4">
-                            <a href="#"
+                            <a href="{{ \App\Helpers\SettingsHelper::get('social_facebook', config('constants.SOCIAL.facebook')) }}"
                                 class="bg-gray-100 hover:bg-primary hover:text-white w-12 h-12 rounded-2xl flex items-center justify-center text-dark transition-all duration-300 hover:scale-110 hover:shadow-lg">
                                 <i class="fab fa-facebook-f"></i>
                             </a>
-                            <a href="#"
+                            <a href="{{ \App\Helpers\SettingsHelper::get('social_instagram', config('constants.SOCIAL.instagram')) }}"
                                 class="bg-gray-100 hover:bg-pink-500 hover:text-white w-12 h-12 rounded-2xl flex items-center justify-center text-dark transition-all duration-300 hover:scale-110 hover:shadow-lg">
                                 <i class="fab fa-instagram"></i>
                             </a>
-                            <a href="#"
+                            <a href="{{ \App\Helpers\SettingsHelper::get('social_pinterest', config('constants.SOCIAL.pinterest') ?? '#') }}"
                                 class="bg-gray-100 hover:bg-red-500 hover:text-white w-12 h-12 rounded-2xl flex items-center justify-center text-dark transition-all duration-300 hover:scale-110 hover:shadow-lg">
                                 <i class="fab fa-pinterest-p"></i>
                             </a>
@@ -210,7 +210,7 @@
                 </div>
                 <h3 class="text-xl font-bold text-dark mb-3">Instant WhatsApp</h3>
                 <p class="text-secondary mb-6">Get quick answers to your questions with instant messaging</p>
-                <a href="{{ config('constants.WHATSAPP_LINK') }}"
+                <a href="{{ \App\Helpers\SettingsHelper::get('social_whatsapp', config('constants.WHATSAPP_LINK')) }}"
                     class="bg-green-500 text-white px-6 py-3 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-green-600 inline-flex items-center">
                     <i class="fab fa-whatsapp mr-2"></i>
                     Start Chat
@@ -286,8 +286,8 @@
                             </div>
                             <div>
                                 <h4 class="font-semibold text-dark mb-1">Address</h4>
-                                <p class="text-secondary">{{ config('constants.SITE_ADDRESS') }}</p>
-                                <p class="text-secondary">Yamuna Nagar, {{ config('constants.SITE_PINCODE') }}</p>
+                                <p class="text-secondary">{{ \App\Helpers\SettingsHelper::get('store_address', config('constants.SITE_ADDRESS')) }}</p>
+                                <p class="text-secondary">Yamuna Nagar, {{ \App\Helpers\SettingsHelper::get('store_pincode', config('constants.SITE_PINCODE')) }}</p>
                                 <p class="text-primary text-sm font-medium mt-1">Landmark: Near Huda Market</p>
                             </div>
                         </div>
@@ -332,19 +332,19 @@
             <div class="lg:col-span-2" data-aos="fade-left">
                 <div class="rounded-3xl overflow-hidden shadow-2xl border border-primary/10">
                     <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3452.769921153434!2d77.2994153151155!3d30.0720729818748!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390fb5b5dac5e5a5%3A0x4a5a5a5a5a5a5a5a!2sHUDA%20Sector%2017%2C%20Yamuna%20Nagar%2C%20Haryana%20135003!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin"
+                        src="{{ \App\Helpers\SettingsHelper::get('store_map_url', 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3452.769921153434!2d77.2994153151155!3d30.0720729818748!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390fb5b5dac5e5a5%3A0x4a5a5a5a5a5a5a5a!2sHUDA%20Sector%2017%2C%20Yamuna%20Nagar%2C%20Haryana%20135003!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin') }}"
                         width="100%" height="500" style="border:0;" allowfullscreen="" loading="lazy"
                         class="rounded-3xl"></iframe>
                 </div>
 
                 <!-- Quick Actions -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-                    <a href="{{ config('constants.WHATSAPP_LINK') }}?text=I'm planning to visit your store. What's the best time to come?" 
+                    <a href="{{ \App\Helpers\SettingsHelper::get('social_whatsapp', config('constants.WHATSAPP_LINK')) }}?text=I'm planning to visit your store. What's the best time to come?" 
                        class="bg-primary text-white px-6 py-4 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-primary/90 flex items-center justify-center text-center">
                         <i class="fab fa-whatsapp mr-3 text-xl"></i>
                         Confirm Visit Timing
                     </a>
-                    <a href="tel:{{ config('constants.SITE_PHONE') }}" 
+                    <a href="tel:{{ \App\Helpers\SettingsHelper::get('store_phone', config('constants.SITE_PHONE')) }}" 
                        class="bg-white text-dark border border-primary px-6 py-4 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-primary hover:text-white flex items-center justify-center text-center">
                         <i class="fas fa-phone mr-3 text-xl"></i>
                         Call for Directions

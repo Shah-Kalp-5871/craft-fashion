@@ -22,7 +22,7 @@
         </div>
 
         <!-- Swiper -->
-        <div class="swiper section-swiper-{{ $section['style'] }} overflow-visible">
+        <div class="swiper section-swiper-{{ $section['style'] }}">
             <div class="swiper-wrapper">
                 @foreach($section['products'] as $product)
                  @php
@@ -51,6 +51,10 @@
                 new Swiper('.section-swiper-{{ $section['style'] }}', {
                     slidesPerView: 1.5,
                     spaceBetween: 20,
+                    autoplay: {
+                        delay: 3000,
+                        disableOnInteraction: false,
+                    },
                     navigation: {
                         nextEl: '.swiper-next-{{ $section['style'] }}',
                         prevEl: '.swiper-prev-{{ $section['style'] }}',

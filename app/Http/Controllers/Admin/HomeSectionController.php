@@ -27,6 +27,7 @@ class HomeSectionController extends Controller
             'style_5' => 'Style 5 (Diagonal Staggered)',
             'style_6' => 'Style 6 (Circular/Hexagon Layout)',
             'style_7' => 'Style 7 (2 Column Featured Grid)',
+            'style_discover' => 'Discover Your Style (Category Grid)',
         ];
         return view('admin.crm.home-sections.create', compact('categories', 'styles'));
     }
@@ -59,6 +60,7 @@ class HomeSectionController extends Controller
             'style_5' => 'Style 5 (Diagonal Staggered)',
             'style_6' => 'Style 6 (Circular/Hexagon Layout)',
             'style_7' => 'Style 7 (2 Column Featured Grid)',
+            'style_discover' => 'Discover Your Style (Category Grid)',
         ];
         
         $selectedProducts = [];
