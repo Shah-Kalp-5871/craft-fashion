@@ -122,7 +122,7 @@
                                         
                                         @if($product['discount_percent'] > 0)
                                             <div class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
-                                                -{{ $product['discount_percent'] }}%
+                                                {{ $product['discount_percent'] }}% OFF
                                             </div>
                                         @endif
 

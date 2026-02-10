@@ -172,6 +172,21 @@
                                         <div class="absolute top-6 left-6 bg-white/90 backdrop-blur-md text-gray-900 text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-lg">New</div>
                                     @endif
 
+                                    @php
+                                        $price = (float) $product['price'];
+                                        $comparePrice = (float) $product['compare_price'];
+                                        $discount = 0;
+                                        if($comparePrice > $price && $comparePrice > 0) {
+                                            $discount = round((($comparePrice - $price) / $comparePrice) * 100);
+                                        }
+                                    @endphp
+                                    
+                                    @if($discount > 0)
+                                        <div class="absolute top-6 right-6 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest px-4 py-2 rounded-full shadow-lg z-20">
+                                            {{ $discount }}% OFF
+                                        </div>
+                                    @endif
+
                                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center gap-4">
                                         <button onclick="quickView('{{ $product['slug'] }}')" class="w-14 h-14 bg-white text-gray-900 rounded-full flex items-center justify-center hover:bg-primary hover:text-white transition-all transform scale-50 group-hover:scale-100 duration-500 shadow-xl">
                                             <i class="fas fa-expand-alt"></i>
