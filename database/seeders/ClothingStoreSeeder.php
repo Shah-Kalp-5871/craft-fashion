@@ -11,7 +11,7 @@ class ClothingStoreSeeder extends Seeder
     public function run()
     {
         // Disable foreign key checks
-        DB::statement('SET FOREIGN_KEY_CHECKS=0');
+        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
 
         // Clear existing data
         $this->truncateTables();
@@ -34,12 +34,18 @@ class ClothingStoreSeeder extends Seeder
         $this->seedProductRelationships();
 
         // Enable foreign key checks
-        DB::statement('SET FOREIGN_KEY_CHECKS=1');
+        \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
     }
 
     private function truncateTables()
     {
         $tables = [
+            'order_items',
+            'cart_items',
+            'wishlist_items',
+            'reviews',
+            'return_items',
+            'inventory_transfers',
             'category_product',
             'product_tags',
             'related_products',

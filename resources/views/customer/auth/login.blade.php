@@ -140,13 +140,13 @@
                         </button>
 
                         <!-- Divider -->
-                        <div class="flex items-center my-8">
+                        <!-- <div class="flex items-center my-8">
                             <div class="flex-1 border-t border-gray-200"></div>
                             <span class="px-4 text-secondary text-sm">or continue with</span>
                             <div class="flex-1 border-t border-gray-200"></div>
-                        </div>
+                        </div> -->
 
-                        <!-- Social Login (Optional) -->
+                        <!-- Social Login (Optional)
                         <div class="grid grid-cols-2 gap-4 mb-8">
                             <a href="#" class="flex items-center justify-center p-3 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition group">
                                 <i class="fab fa-google text-red-500 mr-2"></i>
@@ -156,7 +156,7 @@
                                 <i class="fab fa-facebook text-blue-600 mr-2"></i>
                                 <span class="text-secondary group-hover:text-dark">Facebook</span>
                             </a>
-                        </div>
+                        </div> -->
                     </form>
 
                     <!-- Register Link -->
