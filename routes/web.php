@@ -554,12 +554,65 @@ Route::fallback(function () {
     return view('customer.errors.404');
 })->name('customer.error.404');
 
-// Temporary route to fix storage link on live server
+// Temporary route to fix and debug storage link on live server
 Route::get('/fix-storage', function () {
+    $target = storage_path('app/public');
+    $link = public_path('storage');
+    
+    echo "<h1>Storage Debugger</h1>";
+    echo "<p><strong>PHP Version:</strong> " . PHP_VERSION . "</p>";
+    echo "<p><strong>APP_URL:</strong> " . config('app.url') . "</p>";
+    echo "<p><strong>Target (storage/app/public):</strong> $target</p>";
+    echo "<p><strong>Link (public/storage):</strong> $link</p>";
+
+    echo "<h2>Status</h2>";
+    if (file_exists($target)) {
+        echo "<p style='color:green'>&#10004; Target directory exists.</p>";
+    } else {
+        echo "<p style='color:red'>&#10008; Target directory DOES NOT exist!</p>";
+    }
+
+    if (file_exists($link)) {
+        echo "<p style='color:green'>&#10004; Link exists.</p>";
+        if (is_link($link)) {
+            echo "<p>Type: Symlink</p>";
+            echo "<p>Points to: " . readlink($link) . "</p>";
+        } else {
+            echo "<p style='color:orange'>Type: Directory (Not a symlink! This might be the problem if it's an actual folder)</p>";
+        }
+    } else {
+        echo "<p style='color:red'>&#10008; Link DOES NOT exist.</p>";
+    }
+
+    echo "<h2>Actions</h2>";
+    
     try {
-        \Illuminate\Support\Facades\Artisan::call('storage:link');
-        return 'Storage link created successfully!';
+        if (file_exists($link) && !is_link($link)) {
+            echo "<p>Attempting to remove existing 'storage' directory...</p>";
+            // Use rmdir or rename if it's a directory
+            rename($link, public_path('storage_backup_' . time()));
+            echo "<p>Renamed existing 'storage' directory to backup.</p>";
+        }
+
+        if (file_exists($link) && is_link($link)) {
+             unlink($link);
+             echo "<p>Removed old symlink.</p>";
+        }
+
+        app('files')->link($target, $link);
+        echo "<p style='color:green; font-weight:bold'>&#10004; Check: Symlink created successfully!</p>";
     } catch (\Exception $e) {
-        return 'Error creating storage link: ' . $e->getMessage();
+        echo "<p style='color:red'>Error creating symlink: " . $e->getMessage() . "</p>";
+    }
+    
+    echo "<h2>Test File</h2>";
+    $testFile = 'test_debug.txt';
+    try {
+        \Illuminate\Support\Facades\Storage::disk('public')->put($testFile, 'Debug test content ' . time());
+        $url = \Illuminate\Support\Facades\Storage::disk('public')->url($testFile);
+        echo "<p>Created test file. URL: <a href='$url' target='_blank'>$url</a></p>";
+        echo "<p>Click the link above. If it works, images should work. If 404, check checking APP_URL matches domain.</p>";
+    } catch (\Exception $e) {
+         echo "<p style='color:red'>Failed to create test file: " . $e->getMessage() . "</p>";
     }
 });
