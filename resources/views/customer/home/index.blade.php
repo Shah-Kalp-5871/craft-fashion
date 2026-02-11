@@ -275,7 +275,7 @@
                  <div class="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4 text-primary text-2xl">
                     <i class="fas fa-truck"></i>
                 </div>
-                <h4 class="font-bold text-dark mb-2">Fast Delivery</h4>
+                <h4 class="font-bold text-dark mb-2">Fastest Delivery</h4>
                 <p class="text-sm text-gray-500">Express shipping across India</p>
             </div>
             <div data-aos="fade-up" data-aos-delay="100" class="text-center p-6 bg-gray-50 rounded-xl">
