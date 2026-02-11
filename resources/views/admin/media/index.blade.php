@@ -614,16 +614,15 @@
                 });
 
                 if (response.data.success) {
-                    const data = response.data.data;
-                    const meta = data.meta;
+                    const paginationData = response.data.data;
 
                     // Update table data
-                    mediaTable.setData(data.data);
+                    mediaTable.setData(paginationData.data);
 
                     // Update pagination info
-                    totalItems = meta.total;
-                    totalPages = meta.last_page;
-                    updatePaginationInfo(meta);
+                    totalItems = paginationData.total;
+                    totalPages = paginationData.last_page;
+                    updatePaginationInfo(paginationData);
                     renderPageNumbers();
 
                     // Update bulk actions

@@ -46,12 +46,13 @@ class MediaController extends Controller
             $media = $query->paginate($perPage);
 
             $items = $media->getCollection()->transform(function ($item) {
+                $disk = $item->disk ?? 'public';
                 return [
                     'id' => $item->id,
-                    'url' => asset(Storage::url($item->file_path)),
+                    'url' => asset(Storage::disk($disk)->url($item->file_path)),
                     'thumbnail_url' => $item->thumbnails && isset($item->thumbnails['small']) 
-                        ? asset(Storage::url($item->thumbnails['small'])) 
-                        : asset(Storage::url($item->file_path)),
+                        ? asset(Storage::disk($disk)->url($item->thumbnails['small'])) 
+                        : asset(Storage::disk($disk)->url($item->file_path)),
                     'file_path' => $item->file_path,
                     'file_name' => $item->file_name,
                     'mime_type' => $item->mime_type,
