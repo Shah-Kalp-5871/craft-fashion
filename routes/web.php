@@ -553,3 +553,13 @@ Route::name('customer.')->group(function () {
 Route::fallback(function () {
     return view('customer.errors.404');
 })->name('customer.error.404');
+
+// Temporary route to fix storage link on live server
+Route::get('/fix-storage', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('storage:link');
+        return 'Storage link created successfully!';
+    } catch (\Exception $e) {
+        return 'Error creating storage link: ' . $e->getMessage();
+    }
+});
