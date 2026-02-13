@@ -29,7 +29,7 @@
                             <img src="{{ Str::startsWith($pImage, 'http') ? $pImage : asset('storage/' . $pImage) }}" 
                                  alt="{{ $pName }}" 
                                  class="w-full h-full object-cover transition duration-700 group-hover:scale-110"
-                                 onerror="this.src='https://placehold.co/400x500?text={{ urlencode($pName) }}'">
+                                 onerror="this.onerror=null;this.src='/storage/images/placeholder-product.jpg';">
                         </a>
                         
                         <!-- Actions -->

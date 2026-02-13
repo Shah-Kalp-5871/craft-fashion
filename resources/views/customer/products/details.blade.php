@@ -392,7 +392,7 @@
                                         <img src="{{ Str::startsWith($relatedProduct['main_image'] ?? '', 'http') ? $relatedProduct['main_image'] : asset('storage/' . ($relatedProduct['main_image'] ?? '')) }}" 
                                             alt="{{ $relatedProduct['name'] }}"
                                             class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                                            onerror="this.src='{{ asset('images/placeholder-product.jpg') }}'">
+                                            onerror="this.onerror=null;this.src='/storage/images/placeholder-product.jpg';">
                                         @if($relatedProduct['discount_percent'] > 0)
                                             <div class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
                                                 -{{ $relatedProduct['discount_percent'] }}%

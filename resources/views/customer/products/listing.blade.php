@@ -273,7 +273,7 @@
                                 <img src="{{ Str::startsWith($product['main_image'] ?? '', 'http') ? $product['main_image'] : asset('storage/' . ($product['main_image'] ?? '')) }}" 
                                     alt="{{ $product['name'] }}" 
                                     class="w-full h-full object-cover transition duration-500 group-hover:scale-110"
-                                    onerror="this.src='https://placehold.co/400x500?text=Craft+Fashion'">
+                                    onerror="this.onerror=null;this.src='/storage/images/placeholder-product.jpg';">
                             </a>
                             
                             <!-- Badges -->

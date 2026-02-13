@@ -415,7 +415,7 @@ class ProductService
     private function transformProductForListing(Product $product): array
     {
         $defaultVariant = $product->variants->where('is_default', true)->first();
-        $mainImage = '/images/placeholder-product.jpg';
+        $mainImage = '/storage/images/placeholder-product.jpg';
 
         // Get main image
         if ($defaultVariant && $defaultVariant->images && $defaultVariant->images->isNotEmpty()) {
@@ -561,7 +561,7 @@ class ProductService
         }
 
         // Main image (from default variant)
-        $mainImage = '/images/placeholder-product.jpg';
+        $mainImage = '/storage/images/placeholder-product.jpg';
         if ($defaultVariant && $defaultVariant->images && $defaultVariant->images->isNotEmpty()) {
             $primaryImage = $defaultVariant->images->where('pivot.is_primary', true)->first();
             if (!$primaryImage) {

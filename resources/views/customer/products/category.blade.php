@@ -118,7 +118,7 @@
                                         <img src="{{ Str::startsWith($product['main_image'] ?? '', 'http') ? $product['main_image'] : asset('storage/' . ($product['main_image'] ?? '')) }}" 
                                             alt="{{ $product['name'] }}"
                                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-                                            onerror="this.src='https://placehold.co/400x500?text=Craft+Fashion'">
+                                            onerror="this.onerror=null;this.src='/storage/images/placeholder-product.jpg';">
                                         
                                         @if($product['discount_percent'] > 0)
                                             <div class="absolute top-4 left-4 bg-red-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">

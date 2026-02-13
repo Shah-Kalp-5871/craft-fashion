@@ -2,7 +2,7 @@
     <!-- Product Image -->
     <div class="md:w-1/2">
         <div class="aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
-            <img src="{{ Str::startsWith($product['main_image'] ?? '', 'http') ? $product['main_image'] : asset('storage/' . ($product['main_image'] ?? '')) }}" alt="{{ $product['name'] }}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500?text=Craft+Fashion'">
+            <img src="{{ Str::startsWith($product['main_image'] ?? '', 'http') ? $product['main_image'] : asset('storage/' . ($product['main_image'] ?? '')) }}" alt="{{ $product['name'] }}" class="w-full h-full object-cover" onerror="this.onerror=null;this.src='/storage/images/placeholder-product.jpg';">
         </div>
     </div>
 
