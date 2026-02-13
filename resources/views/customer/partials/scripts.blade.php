@@ -116,7 +116,7 @@
     }
 
     // Toast Notification System
-    function showToast(message, type = 'success') {
+    function showToast(message, type = 'success', subtitle = null) {
         let toastContainer = document.getElementById('toast-container');
         if (!toastContainer) {
             toastContainer = document.createElement('div');
@@ -129,6 +129,8 @@
         const bgColor = type === 'success' ? 'bg-white border-primary' : 'bg-white border-red-500';
         const iconColor = type === 'success' ? 'text-primary' : 'text-red-500';
         const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+        
+        const subTextMessage = subtitle || (type === 'success' ? 'Successfully updated' : 'Operation failed');
 
         toast.className = `transform translate-x-[150%] transition-transform duration-500 ease-out pointer-events-auto shadow-2xl p-4 rounded-xl flex items-center gap-4 min-w-[300px] border-l-4 ${bgColor}`;
         toast.innerHTML = `
@@ -137,7 +139,7 @@
             </div>
             <div>
                 <p class="font-bold text-dark">${message}</p>
-                <p class="text-xs text-gray-500">${type === 'success' ? 'Successfully updated' : 'Operation failed'}</p>
+                <p class="text-xs text-gray-500">${subTextMessage}</p>
             </div>
         `;
 
@@ -200,6 +202,11 @@
 
     // Global Wishlist Addition Function
     window.addToWishlist = async function(variantId, btn = null) {
+        @guest
+            showToast('Please login for this feature', 'error', 'Login Required');
+            return;
+        @endguest
+
         if (!variantId) {
             showToast('Please select all options', 'error');
             return;
