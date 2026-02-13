@@ -728,7 +728,12 @@
         
         if(hiddenContainer.querySelector(`input[value="${id}"]`)) return;
         
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = `variants[${idx}][gallery_image_ids][]`;
+        input.value = id;
         input.id = `v-gallery-${idx}-${id}`;
+        
         hiddenContainer.appendChild(input);
         
         const thumb = document.createElement('div');
