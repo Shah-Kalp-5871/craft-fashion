@@ -797,14 +797,14 @@
                         .status-active { background-color: #d1fae5; color: #065f46; }
                         .status-inactive { background-color: #fef3c7; color: #92400e; }
                         .status-blocked { background-color: #fee2e2; color: #991b1b; }
-                    </style>
-                </head>
+                    <\/style>
+                <\/head>
                 <body>
                     <h2>Customers Report</h2>
                     <p>Generated on: ${new Date().toLocaleDateString()}</p>
                     ${printContent}
-                </body>
-            </html>
+                <\/body>
+            <\/html>
         `;
 
         window.print();

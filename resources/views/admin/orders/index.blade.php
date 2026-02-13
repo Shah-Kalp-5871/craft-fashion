@@ -867,14 +867,14 @@
                         .payment-partially_paid { background-color: #f0f9ff; color: #0369a1; }
                         .payment-failed { background-color: #fee2e2; color: #991b1b; }
                         .payment-refunded { background-color: #f5f5f5; color: #525252; }
-                    </style>
-                </head>
+                    <\/style>
+                <\/head>
                 <body>
                     <h2 style="margin-bottom: 5px; color: #111827;">Orders Report</h2>
                     <p style="color: #6b7280; margin-bottom: 20px;">Generated on: ${new Date().toLocaleDateString()}</p>
                     ${printContent.outerHTML}
-                </body>
-            </html>
+                <\/body>
+            <\/html>
         `);
         win.document.close();
         
