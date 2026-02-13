@@ -233,45 +233,30 @@ class AuthController extends Controller
                 ->with('form', 'register');
         }
 
-        // Generate Email OTP
-        $emailOTP = rand(100000, 999999);
-
-        // Prepare customer data for temporary storage
-        $customerData = [
+        // Direct Customer Creation (Skipping Email OTP)
+        $customer = Customer::create([
             'name' => ucwords(strtolower(trim($request->name))),
             'email' => strtolower(trim($request->email)),
             'mobile' => trim($request->mobile),
             'password' => Hash::make($request->password),
             'status' => 1,
-            'email_otp' => $emailOTP,
-            'created_at' => now()->timestamp
-        ];
-
-        // Send OTP via Email
-        try {
-            Mail::to($customerData['email'])->send(new OTPVerify($emailOTP));
-        } catch (\Exception $e) {
-            \Log::error('OTP Email sending failed: ' . $e->getMessage());
-        }
-
-        // Generate a verification key based on email
-        $verificationKey = 'temp_reg_' . md5($customerData['email'] . time());
-
-        // Cache the registration data (valid for 30 minutes, ample time to verify)
-        Cache::put($verificationKey, $customerData, 1800);
-        Cache::put('email_otp_' . $customerData['email'], $emailOTP, 1800);
-
-        // Store minimal data in session to identify the pending registration
-        session([
-            'verification_key' => $verificationKey,
-            'email' => $customerData['email'],
-            'mobile' => $customerData['mobile']
+            'email_verified_at' => now(), // Auto-verify
+            'mobile_verified_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now()
         ]);
 
-        return redirect()->route('customer.verify')
-            ->with([
-                'success' => 'Please verify your email to complete registration.'
-            ]);
+        // Login immediately
+        Auth::guard('customer')->login($customer);
+        $this->cartHelper->syncCart();
+
+        // Optional: Attempt to send welcome email (can fail silently)
+        // try {
+        //     Mail::to($customer->email)->send(new WelcomeEmail($customer));
+        // } catch (\Exception $e) {}
+
+        return redirect()->route('customer.home.index')
+            ->with('success', 'Account created successfully! Welcome to ' . config('app.name'));
     }
 
     public function verifyPage()

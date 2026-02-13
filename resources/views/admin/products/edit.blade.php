@@ -264,14 +264,12 @@
             @endif
 
             <!-- Dynamic Specifications -->
-            {{--
             <div id="specifications-wrapper" class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4 pb-2 border-b">Specifications</h3>
                 <div id="specifications-container" class="space-y-6">
                     <!-- Loaded via JS -->
                 </div>
             </div>
-            --}}
 
         </div>
 
@@ -453,6 +451,7 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
 <script>
     // Prepare existing specs mapping
     const existingSpecs = @json($product->specifications->map(function($s){ 
@@ -474,6 +473,8 @@
         if (!categoryId) return;
         
         const container = document.getElementById('specifications-container');
+        if (!container) return;
+        
         container.innerHTML = '<p class="text-gray-500">Loading specifications...</p>';
 
         try {
@@ -492,6 +493,8 @@
 
     function renderSpecifications(groups) {
          const container = document.getElementById('specifications-container');
+         if (!container) return;
+         
          container.innerHTML = '';
 
          if (!groups || groups.length === 0) {

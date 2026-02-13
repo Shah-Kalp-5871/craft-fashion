@@ -120,6 +120,7 @@ class ProductRequest extends FormRequest
             foreach ($this->variants ?? [] as $index => $variant) {
                 $variantId = $variant['id'] ?? null;
 
+                $rules["variants.{$index}.id"] = 'nullable|exists:product_variants,id';
                 $rules["variants.{$index}.sku"] = [
                     'required',
                     'string',

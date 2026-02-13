@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 class ClothingStoreSeeder extends Seeder
@@ -11,7 +12,7 @@ class ClothingStoreSeeder extends Seeder
     public function run()
     {
         // Disable foreign key checks
-        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
+        DB::statement('SET FOREIGN_KEY_CHECKS=0');
 
         // Clear existing data
         $this->truncateTables();
@@ -34,23 +35,41 @@ class ClothingStoreSeeder extends Seeder
         $this->seedProductRelationships();
 
         // Enable foreign key checks
-        \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+        DB::statement('SET FOREIGN_KEY_CHECKS=1');
     }
 
     private function truncateTables()
     {
         $tables = [
+            'order_status_history',
             'order_items',
-            'cart_items',
-            'wishlist_items',
-            'reviews',
+            'orders',
+            'shipment_items',
+            'shipments',
             'return_items',
+            'returns',
+            'payments',
+            'cart_items',
+            'carts',
+            'wishlist_items',
+            'product_reviews',
+            'review_images',
+            'review_votes',
+            'price_histories',
+            'tier_prices',
+            'stock_history',
+            'warehouse_stocks',
+            'inventory_transfer_items',
             'inventory_transfers',
             'category_product',
             'product_tags',
             'related_products',
             'cross_sell_products',
             'upsell_products',
+            'offer_variants',
+            'offer_rewards',
+            'offer_categories',
+            'offer_usages',
             'variant_attributes',
             'product_specifications',
             'variant_images',
@@ -68,11 +87,14 @@ class ClothingStoreSeeder extends Seeder
             'categories',
             'brands',
             'category_hierarchies',
+            'tax_rates',
             'tax_classes',
+            'audit_trails',
+            'activity_logs',
         ];
 
         foreach ($tables as $table) {
-            if (DB::getSchemaBuilder()->hasTable($table)) {
+            if (Schema::hasTable($table)) {
                 DB::table($table)->truncate();
             }
         }
@@ -1527,8 +1549,26 @@ class ClothingStoreSeeder extends Seeder
         $productIds = [];
 
         foreach ($products as $index => $productData) {
-            // Insert product
-            $productId = DB::table('products')->insertGetId($productData);
+            // Check if product with this slug already exists
+            $existingProduct = DB::table('products')
+                ->where('slug', $productData['slug'])
+                ->first();
+
+            if ($existingProduct) {
+                DB::table('products')
+                    ->where('id', $existingProduct->id)
+                    ->update($productData);
+                $productId = $existingProduct->id;
+
+                // Clear existing relationships for this product to avoid duplicates
+                DB::table('category_product')->where('product_id', $productId)->delete();
+                DB::table('product_tags')->where('product_id', $productId)->delete();
+                DB::table('related_products')->where('product_id', $productId)->delete();
+                DB::table('product_specifications')->where('product_id', $productId)->delete();
+            } else {
+                $productId = DB::table('products')->insertGetId($productData);
+            }
+
             $productIds[] = $productId;
 
             // Create variants based on product category
@@ -1596,7 +1636,24 @@ class ClothingStoreSeeder extends Seeder
         }
 
         foreach ($variants as $variantData) {
-            $variantId = DB::table('product_variants')->insertGetId($variantData['variant']);
+            // Check if variant with this SKU already exists
+            $existingVariant = DB::table('product_variants')
+                ->where('sku', $variantData['variant']['sku'])
+                ->first();
+
+            if ($existingVariant) {
+                DB::table('product_variants')
+                    ->where('id', $existingVariant->id)
+                    ->update($variantData['variant']);
+                $variantId = $existingVariant->id;
+                
+                // Clear existing attributes for this variant to avoid duplicates
+                DB::table('variant_attributes')
+                    ->where('variant_id', $variantId)
+                    ->delete();
+            } else {
+                $variantId = DB::table('product_variants')->insertGetId($variantData['variant']);
+            }
 
             foreach ($variantData['attributes'] as $attributeData) {
                 DB::table('variant_attributes')->insert([
