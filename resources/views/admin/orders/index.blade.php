@@ -829,33 +829,61 @@
     }
 
     function printTable() {
-        const printContent = document.getElementById('ordersTable').outerHTML;
-        const originalContent = document.body.innerHTML;
-
-        document.body.innerHTML = `
+        const printContent = document.getElementById('ordersTable').cloneNode(true);
+        
+        // Remove the 'Actions' column header and body cells from the clone
+        const headers = printContent.querySelectorAll('th:last-child');
+        headers.forEach(header => header.remove());
+        
+        const cells = printContent.querySelectorAll('td:last-child');
+        cells.forEach(cell => cell.remove());
+        
+        const win = window.open('', '', 'width=900,height=600');
+        win.document.write(`
             <html>
                 <head>
                     <title>Orders Report</title>
                     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
                     <style>
-                        body { font-family: Arial, sans-serif; }
-                        table { width: 100%; border-collapse: collapse; }
-                        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-                        th { background-color: #f8f9fa; }
-                        .status-badge { padding: 2px 8px; border-radius: 12px; font-size: 12px; }
+                        body { font-family: 'Inter', sans-serif; padding: 20px; }
+                        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                        th, td { border: 1px solid #e5e7eb; padding: 12px; text-align: left; }
+                        th { background-color: #f9fafb; font-weight: 600; color: #374151; }
+                        td { color: #4b5563; }
+                        .status-badge { padding: 4px 12px; border-radius: 9999px; font-size: 12px; font-weight: 500; display: inline-block; }
+                        
+                        /* Status Colors */
+                        .status-pending { background-color: #fef3c7; color: #92400e; }
+                        .status-confirmed { background-color: #dbeafe; color: #1e40af; }
+                        .status-processing { background-color: #e0e7ff; color: #3730a3; }
+                        .status-shipped { background-color: #f0f9ff; color: #0369a1; }
+                        .status-delivered { background-color: #d1fae5; color: #065f46; }
+                        .status-cancelled { background-color: #fee2e2; color: #991b1b; }
+                        .status-refunded { background-color: #f5f5f5; color: #525252; }
+                        
+                        /* Payment Status Colors */
+                        .payment-pending { background-color: #fef3c7; color: #92400e; }
+                        .payment-paid { background-color: #d1fae5; color: #065f46; }
+                        .payment-partially_paid { background-color: #f0f9ff; color: #0369a1; }
+                        .payment-failed { background-color: #fee2e2; color: #991b1b; }
+                        .payment-refunded { background-color: #f5f5f5; color: #525252; }
                     </style>
                 </head>
                 <body>
-                    <h2>Orders Report</h2>
-                    <p>Generated on: ${new Date().toLocaleDateString()}</p>
-                    ${printContent}
+                    <h2 style="margin-bottom: 5px; color: #111827;">Orders Report</h2>
+                    <p style="color: #6b7280; margin-bottom: 20px;">Generated on: ${new Date().toLocaleDateString()}</p>
+                    ${printContent.outerHTML}
                 </body>
             </html>
-        `;
-
-        window.print();
-        document.body.innerHTML = originalContent;
-        location.reload();
+        `);
+        win.document.close();
+        
+        // Wait for styles to load before printing
+        setTimeout(() => {
+            win.focus();
+            win.print();
+            win.close();
+        }, 500);
     }
 
     function showLoading() {
