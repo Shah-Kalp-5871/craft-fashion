@@ -867,6 +867,7 @@
     }
 
     function showBulkActions() {
+        console.log('showBulkActions triggered');
         if (selectedOrders.size === 0) {
             toastr.warning('Please select at least one order');
             return;
@@ -891,6 +892,7 @@
     }
 
     function bulkDelete() {
+        console.log('bulkDelete triggered');
         if (selectedOrders.size === 0) {
             toastr.warning('Please select at least one order');
             return;
