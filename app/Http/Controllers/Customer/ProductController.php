@@ -99,7 +99,7 @@ class ProductController extends Controller
             $page = $request->get('page', 1);
 
             $filters = [
-                'category_id' => $category->id,
+                'category_id' => $this->productService->getAllCategoryIds($category->id),
                 'sort_by' => $request->get('sort_by', 'newest'),
                 'min_price' => $request->get('min_price'),
                 'max_price' => $request->get('max_price'),
