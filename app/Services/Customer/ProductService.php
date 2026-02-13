@@ -255,12 +255,10 @@ class ProductService
             // Category filter
             if (!empty($filters['category_id'])) {
                 $categoryIds = is_array($filters['category_id']) ? $filters['category_id'] : [$filters['category_id']];
-                $query->where(function ($q) use ($categoryIds) {
-                    $q->whereIn('products.main_category_id', $categoryIds)
-                        ->orWhereHas('categories', function ($q2) use ($categoryIds) {
-                            $q2->whereIn('categories.id', $categoryIds);
-                        });
-                });
+                
+                // STRICT filtering: Only check main_category_id
+                // This ensures a product only appears in its primary assigned category
+                $query->whereIn('products.main_category_id', $categoryIds);
             }
 
             // Brand filter
