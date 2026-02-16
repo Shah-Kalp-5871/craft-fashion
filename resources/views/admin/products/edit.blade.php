@@ -478,7 +478,7 @@
         container.innerHTML = '<p class="text-gray-500">Loading specifications...</p>';
 
         try {
-            const response = await axios.get(`categories/${categoryId}/specifications`);
+            const response = await axios.get(`{{ url('admin/products/category') }}/${categoryId}/specifications`);
             
             if(response.data.success) {
                 renderSpecifications(response.data.data);
