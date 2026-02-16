@@ -71,10 +71,16 @@
     const cartChannel = new BroadcastChannel('cart_updates');
 
     // Cart Count Update Logic
-    function updateCartCount(count, fromBroadcast = false) {
+    window.updateCartCount = function(count, fromBroadcast = false) {
+        console.log('updateCartCount called with count:', count, 'fromBroadcast:', fromBroadcast);
+        
         // Update UI
-        document.querySelectorAll('.cart-badge').forEach(badge => {
+        const badges = document.querySelectorAll('.cart-badge');
+        console.log('Found cart badges:', badges.length);
+        
+        badges.forEach(badge => {
             if (badge) {
+                console.log('Updating badge, old value:', badge.textContent, 'new value:', count);
                 badge.textContent = count;
                 if (count > 0) {
                     badge.classList.remove('hidden');
@@ -92,7 +98,7 @@
                 sourceTabId: window.TAB_ID
             });
         }
-    }
+    };
 
     // Listen for cart updates from other tabs
     cartChannel.onmessage = (event) => {

@@ -70,12 +70,14 @@ class CartHelper
         }
 
         $this->recalculateCartTotals($cart);
+        
+        $formattedCart = $this->formatCartResponse($cart);
 
         return [
             'success' => true,
             'message' => 'Product added to cart',
-            'cart_count' => $this->getCartCount(),
-            'cart' => $this->formatCartResponse($cart)
+            'cart_count' => $formattedCart['items_count'], // Use formatted cart count for accuracy
+            'cart' => $formattedCart
         ];
     }
 
@@ -112,16 +114,15 @@ class CartHelper
             }
         }
 
-        // Check if item already exists
+        // Check if item already exists (only check variant_id, not attributes)
         $itemExists = false;
         foreach ($cart['items'] as &$item) {
-            if (
-                $item['variant_id'] == $variantId &&
-                json_encode($item['attributes']) == json_encode($attributes)
-            ) {
+            if ($item['variant_id'] == $variantId) {
                 $item['quantity'] += $quantity;
                 $item['total'] = $item['unit_price'] * $item['quantity'];
                 $item['tax_rates'] = $taxRates; // Update tax rates just in case
+                // Update attributes to latest selection
+                $item['attributes'] = $attributes;
                 $itemExists = true;
                 break;
             }
@@ -150,7 +151,7 @@ class CartHelper
         return [
             'success' => true,
             'message' => 'Product added to cart',
-            'cart_count' => $this->getCartCount(),
+            'cart_count' => $cart['items_count'], // Use updated cart count, not getCartCount() which reads stale cookies
             'cart' => $cart
         ];
     }

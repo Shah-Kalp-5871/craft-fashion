@@ -737,16 +737,40 @@
                 quantity: currentQuantity
             });
 
+            console.log('Add to cart response:', response.data);
+
             if (response.data.success) {
                 showToast('Added to cart successfully!', 'success');
-                // Update cart count in header if possible
-                if (typeof updateCartCount === 'function') {
-                    updateCartCount(response.data.cart_count);
+                
+                const cartCount = response.data.cart_count;
+                console.log('Cart count from response:', cartCount);
+                
+                // Method 1: Try window.updateCartCount
+                if (typeof window.updateCartCount === 'function') {
+                    console.log('Calling window.updateCartCount');
+                    window.updateCartCount(cartCount);
+                } else {
+                    console.error('window.updateCartCount not found!');
                 }
+                
+                // Method 2: Direct update as fallback
+                console.log('Also updating badges directly...');
+                const badges = document.querySelectorAll('.cart-badge');
+                console.log('Found badges:', badges.length);
+                badges.forEach(badge => {
+                    console.log('Updating badge directly');
+                    badge.textContent = cartCount;
+                    if (cartCount > 0) {
+                        badge.classList.remove('hidden');
+                    } else {
+                        badge.classList.add('hidden');
+                    }
+                });
             } else {
                 showToast(response.data.message || 'Failed to add to cart', 'error');
             }
         } catch (error) {
+            console.error('Add to cart error:', error);
             showToast('Error adding to cart', 'error');
         } finally {
             text.textContent = originalText;
