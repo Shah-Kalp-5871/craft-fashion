@@ -208,7 +208,7 @@
 
     // Global Wishlist Addition Function
     window.addToWishlist = async function(variantId, btn = null) {
-        @guest
+        @guest('customer')
             showToast('Please login for this feature', 'error', 'Login Required');
             return;
         @endguest
