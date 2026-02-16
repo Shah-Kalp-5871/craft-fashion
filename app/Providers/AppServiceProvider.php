@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
 
-        \Illuminate\Support\Facades\View::composer('customer.partials.header', function ($view) {
+        \Illuminate\Support\Facades\View::composer('customer.*', function ($view) {
             $view->with('navCategories', \App\Models\Category::where('show_in_nav', true)
                 ->where('status', true)
                 ->orderBy('sort_order')
