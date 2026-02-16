@@ -40,7 +40,7 @@ return [
 
         'public' => [
             'driver' => 'local',
-            'root' => public_path('storage'),
+            'root' => '/home/yv2gbaj1tilp/public_html/storage',
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
             'throw' => false,
