@@ -167,11 +167,11 @@ $navItems = [
         ],
     ],
 
-    'pages' => [
-        'title' => 'Pages',
-        'icon' => 'fas fa-file-alt',
-        'route' => 'admin.pages.index',
-    ],
+    // 'pages' => [
+    //     'title' => 'Pages',
+    //     'icon' => 'fas fa-file-alt',
+    //     'route' => 'admin.pages.index',
+    // ],
 
     'reviews' => [
         'title' => 'Reviews',
