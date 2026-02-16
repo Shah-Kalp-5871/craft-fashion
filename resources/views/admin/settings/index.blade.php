@@ -278,7 +278,7 @@
                                 <div class="flex gap-2">
                                     <input type="text" data-key="logo_url" id="logo_url" readonly class="setting-input w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg outline-none cursor-default" placeholder="/assets/logo.png">
                                     <div class="flex gap-1">
-                                        <button type="button" onclick="document.getElementById('logo_file').click()" class="upload-btn px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 shrink-0">
+                                        <button type="button" onclick="openMediaModal('logo')" class="upload-btn px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 shrink-0">
                                             <i class="fas fa-upload w-4 h-4"></i>
                                             Upload
                                         </button>
@@ -287,7 +287,6 @@
                                         </button>
                                     </div>
                                 </div>
-                                <input type="file" id="logo_file" class="hidden" accept="image/*" onchange="handleFileUpload(event, 'logo_url')">
                                 <div class="mt-2 shrink-0">
                                     <img id="logo_preview" src="" alt="Logo Preview" class="img-preview h-12 w-auto object-contain rounded border border-gray-200 hidden">
                                 </div>
@@ -297,7 +296,7 @@
                                 <div class="flex gap-2">
                                     <input type="text" data-key="favicon_url" id="favicon_url" readonly class="setting-input w-full px-4 py-2.5 bg-gray-50 border border-gray-300 rounded-lg outline-none cursor-default" placeholder="/favicon.ico">
                                     <div class="flex gap-1">
-                                        <button type="button" onclick="document.getElementById('favicon_file').click()" class="upload-btn px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 shrink-0">
+                                        <button type="button" onclick="openMediaModal('favicon')" class="upload-btn px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors flex items-center gap-2 shrink-0">
                                             <i class="fas fa-upload w-4 h-4"></i>
                                             Upload
                                         </button>
@@ -306,7 +305,6 @@
                                         </button>
                                     </div>
                                 </div>
-                                <input type="file" id="favicon_file" class="hidden" accept="image/x-icon,image/png,image/gif" onchange="handleFileUpload(event, 'favicon_url')">
                                 <div class="mt-2 shrink-0">
                                     <img id="favicon_preview" src="" alt="Favicon Preview" class="img-preview h-8 w-8 object-contain rounded border border-gray-200 hidden">
                                 </div>
@@ -398,6 +396,55 @@
         to { opacity: 1; transform: translateY(0); }
     }
 </style>
+
+<!-- Media Modal -->
+<div id="media-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeMediaModal()"></div>
+        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+        <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+            <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Select Media</h3>
+                    <button type="button" onclick="closeMediaModal()" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                        <span class="sr-only">Close</span>
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="flex flex-col md:flex-row justify-between mb-4 space-y-2 md:space-y-0">
+                    <input type="text" id="media-search" placeholder="Search files..." class="border rounded px-3 py-2 w-full md:w-1/3">
+                    <div class="flex items-center space-x-2">
+                        <label class="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow transition">
+                            <span>Upload New</span>
+                            <input type="file" id="media-upload" class="hidden" multiple accept="image/*">
+                        </label>
+                    </div>
+                </div>
+
+                <div id="media-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-h-96 overflow-y-auto p-2 border rounded">
+                    <!-- Loaded dynamically -->
+                    <div class="col-span-full text-center py-10 text-gray-500">Loading media...</div>
+                </div>
+
+                <div id="media-pagination" class="mt-4 flex justify-between items-center">
+                    <!-- Pagination links -->
+                </div>
+            </div>
+            <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                <button type="button" id="media-select-btn" onclick="confirmMediaSelection()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
+                    Select
+                </button>
+                <button type="button" onclick="closeMediaModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -672,65 +719,201 @@ function togglePasswordVisibility(inputId, btn) {
     }
 }
 
-async function handleFileUpload(event, key) {
-    const file = event.target.files[0];
-    if (!file) return;
+// =============== MEDIA MODAL FUNCTIONS ===============
 
-    const formData = new FormData();
-    formData.append('files[]', file);
+let currentMediaMode = 'logo'; // 'logo' or 'favicon'
+let selectedMediaImage = null;
+let currentMediaData = null;
 
-    const container = event.target.closest('.space-y-2');
-    const uploadBtn = container.querySelector('.upload-btn');
-    const originalContent = uploadBtn.innerHTML;
+function openMediaModal(mode = 'logo') {
+    currentMediaMode = mode;
+    selectedMediaImage = null;
 
-    uploadBtn.disabled = true;
-    uploadBtn.innerHTML = `<i class="fas fa-spinner fa-spin w-4 h-4"></i>`;
+    // Set modal title based on mode
+    const modalTitle = mode === 'logo' ? 'Select Logo Image' : 'Select Favicon Image';
+    document.getElementById('modal-title').textContent = modalTitle;
+
+    // Show modal
+    document.getElementById('media-modal').classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+
+    // Load media
+    loadMediaFiles(1);
+}
+
+function closeMediaModal() {
+    document.getElementById('media-modal').classList.add('hidden');
+    document.body.classList.remove('overflow-hidden');
+    selectedMediaImage = null;
+    currentMediaMode = 'logo';
+}
+
+async function loadMediaFiles(page = 1, search = '') {
+    const grid = document.getElementById('media-grid');
+    const pagination = document.getElementById('media-pagination');
+
+    grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-500">Loading media...</div>';
 
     try {
-        const response = await axiosInstance.post('/media/upload', formData, {
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
+        const response = await axiosInstance.get('{{ route('admin.media.data') }}', {
+            params: { page, search }
         });
 
         if (response.data.success) {
-            let url = '';
-            if (response.data.all_uploaded && response.data.all_uploaded.length > 0) {
-                url = response.data.all_uploaded[0].url;
-            } else if (response.data.data && response.data.data.url) {
-                url = response.data.data.url;
-            } else if (response.data.url) { // Fallback
-                url = response.data.url; 
-            }
-            const input = document.getElementById(key);
-            if (input) {
-                input.value = url;
-            } else {
-                const dataInput = document.querySelector(`[data-key="${key}"]`);
-                if (dataInput) dataInput.value = url;
-            }
+            const mediaItems = response.data.data?.data || [];
+            const meta = response.data.data?.meta || response.data.meta || {};
             
-            // Update preview
-            const previewId = key.replace('url', 'preview');
-            const preview = document.getElementById(previewId);
-            if (preview) {
-                preview.src = url;
-                preview.classList.remove('hidden');
-            }
-            
-            toastr.success('File uploaded successfully!');
-        } else {
-            toastr.error(response.data.message || 'Upload failed');
+            currentMediaData = response.data.data;
+            renderMediaGrid(mediaItems);
+            renderMediaPagination(meta);
         }
     } catch (error) {
-        console.error('Upload Error:', error);
-        toastr.error('Failed to upload file. Check file size or type.');
-    } finally {
-        uploadBtn.disabled = false;
-        uploadBtn.innerHTML = originalContent;
-        event.target.value = '';
+        console.error('Media load error:', error);
+        grid.innerHTML = '<div class="col-span-full text-center py-10 text-red-500">Error loading media.</div>';
+        toastr.error('Failed to load media');
     }
 }
+
+function renderMediaGrid(media) {
+    const grid = document.getElementById('media-grid');
+
+    if (!media || media.length === 0) {
+        grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-500">No media found.</div>';
+        return;
+    }
+
+    let html = '';
+    media.forEach(item => {
+        const isSelected = selectedMediaImage && selectedMediaImage.id === item.id;
+        html += `
+        <div class="relative border rounded-lg overflow-hidden cursor-pointer group ${isSelected ? 'ring-2 ring-blue-500' : ''}"
+             onclick="toggleMediaSelection(${item.id}, '${item.url || item.path}')">
+            <img src="${item.url || item.path}" class="w-full h-32 object-cover">
+            <div class="p-2 text-xs truncate">${item.filename || item.name}</div>
+            <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition"></div>
+            ${isSelected ?
+                '<div class="absolute top-2 right-2 bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center">✓</div>'
+                : ''}
+        </div>
+        `;
+    });
+
+    grid.innerHTML = html;
+}
+
+function renderMediaPagination(meta) {
+    const pagination = document.getElementById('media-pagination');
+    if (!meta || meta.last_page <= 1) {
+        pagination.innerHTML = '';
+        return;
+    }
+
+    let html = '<div class="flex gap-2">';
+    const currentPage = meta.current_page;
+    const lastPage = meta.last_page;
+
+    for (let i = 1; i <= lastPage; i++) {
+        const active = (i === currentPage) ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700';
+        html += `
+        <button type="button" onclick="loadMediaFiles(${i}, document.getElementById('media-search').value)"
+                class="px-3 py-1 rounded ${active} hover:bg-blue-600 hover:text-white transition">
+            ${i}
+        </button>
+        `;
+    }
+
+    html += '</div>';
+    pagination.innerHTML = html;
+}
+
+function toggleMediaSelection(id, url) {
+    // Single selection mode
+    selectedMediaImage = { id, url };
+
+    // Re-render grid with updated selection
+    if (currentMediaData && currentMediaData.data) {
+        renderMediaGrid(currentMediaData.data);
+    }
+}
+
+function confirmMediaSelection() {
+    if (!selectedMediaImage) {
+        toastr.warning('Please select an image');
+        return;
+    }
+
+    const { id, url } = selectedMediaImage;
+
+    if (currentMediaMode === 'logo') {
+        document.getElementById('logo_url').value = url;
+        const preview = document.getElementById('logo_preview');
+        if (preview) {
+            preview.src = url;
+            preview.classList.remove('hidden');
+        }
+    } else if (currentMediaMode === 'favicon') {
+        document.getElementById('favicon_url').value = url;
+        const preview = document.getElementById('favicon_preview');
+        if (preview) {
+            preview.src = url;
+            preview.classList.remove('hidden');
+        }
+    }
+
+    closeMediaModal();
+    toastr.success('Image selected successfully');
+}
+
+// Handle file upload via media modal
+document.addEventListener('DOMContentLoaded', function() {
+    const mediaUploadInput = document.getElementById('media-upload');
+    if (mediaUploadInput) {
+        mediaUploadInput.addEventListener('change', handleMediaUpload);
+    }
+
+    // Debounced search
+    const mediaSearch = document.getElementById('media-search');
+    if (mediaSearch) {
+        let searchTimeout;
+        mediaSearch.addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                loadMediaFiles(1, e.target.value);
+            }, 500);
+        });
+
+        // Handle Enter key in search
+        mediaSearch.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                loadMediaFiles(1, this.value);
+            }
+        });
+    }
+});
+
+async function handleMediaUpload(event) {
+    const files = event.target.files;
+    if (!files.length) return;
+
+    const formData = new FormData();
+    for (let i = 0; i < files.length; i++) {
+        formData.append('files[]', files[i]);
+    }
+
+    try {
+        const response = await axiosInstance.post('{{ route('admin.media.upload') }}', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+
+        toastr.success('Files uploaded successfully');
+        loadMediaFiles(1); // Reload media grid
+        event.target.value = ''; // Reset file input
+    } catch (error) {
+        console.error('Upload error:', error);
+        toastr.error('Failed to upload files');
+    }
+}
+
 
 function clearToDefault(key, defaultPath) {
     const input = document.getElementById(key);
