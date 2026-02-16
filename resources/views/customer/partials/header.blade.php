@@ -58,8 +58,8 @@
         }
     </style>
     <div class="flex flex-col items-center">
-        @if(file_exists(public_path('storage/assets/images/logo.png')))
-            <img src="{{ asset('storage/assets/images/logo.png') }}" alt="Logo" class="loading-logo">
+        @if($logo = \App\Helpers\SettingsHelper::get('logo_url'))
+            <img src="{{ $logo }}" alt="Logo" class="loading-logo">
         @else
             <h2 class="text-3xl font-playfair font-bold text-primary mb-8 loading-logo">{{ config('constants.SITE_NAME') }}</h2>
         @endif
@@ -94,8 +94,8 @@
     <div class="container mx-auto px-4 py-3 flex justify-between items-center">
         <!-- Logo -->
         <a href="{{ route('customer.home.index') }}" class="text-2xl font-bold text-dark font-playfair flex items-center gap-2">
-            @if(file_exists(public_path('storage/assets/images/logo.png')))
-                <img src="{{ asset('storage/assets/images/logo.png') }}" alt="Logo" class="h-12">
+            @if($logo = \App\Helpers\SettingsHelper::get('logo_url'))
+                <img src="{{ $logo }}" alt="Logo" class="h-12">
             @else
                 <span>{{ config('constants.SITE_NAME') }}</span>
             @endif
