@@ -124,12 +124,12 @@
                         <i class="fas fa-columns mr-2"></i>Columns
                     </button>
                     <!-- Export Dropdown -->
-                    <div class="relative group">
+                    <div class="relative">
                         <button id="brandsExportBtn" class="btn-primary">
                             <i class="fas fa-file-export mr-2"></i>Export
                         </button>
-                        <div
-                            class="absolute mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 hidden group-hover:block
+                        <div id="brandsExportDropdown"
+                            class="absolute mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 hidden
                right-0 md:right-0 md:left-auto
                left-0 md:left-auto">
                             <button data-export="csv"
@@ -339,53 +339,6 @@
         </div>
     </div>
 
-    <!-- Media Modal -->
-    <div id="media-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeMediaModal()"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Select Media</h3>
-                        <button type="button" onclick="closeMediaModal()" class="text-gray-400 hover:text-gray-500 focus:outline-none">
-                            <span class="sr-only">Close</span>
-                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        </button>
-                    </div>
-
-                    <div class="flex flex-col md:flex-row justify-between mb-4 space-y-2 md:space-y-0">
-                        <input type="text" id="media-search" placeholder="Search files..." class="border rounded px-3 py-2 w-full md:w-1/3">
-                        <div class="flex items-center space-x-2">
-                            <label class="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow transition">
-                                <span>Upload New</span>
-                                <input type="file" id="media-upload" class="hidden" multiple accept="image/*">
-                            </label>
-                        </div>
-                    </div>
-
-                    <div id="media-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-h-96 overflow-y-auto p-2 border rounded">
-                        <!-- Loaded dynamically -->
-                        <div class="col-span-full text-center py-10 text-gray-500">Loading media...</div>
-                    </div>
-
-                    <div id="media-pagination" class="mt-4 flex justify-between items-center">
-                        <!-- Pagination links -->
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" id="media-select-btn" onclick="confirmMediaSelection()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
-                        Select
-                    </button>
-                    <button type="button" onclick="closeMediaModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 
 @push('styles')
@@ -752,19 +705,11 @@
                             const data = row.getData();
 
                             return `
-                        <div class="flex items-center space-x-3">
-                            <div class="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden flex-shrink-0">
-                                ${data.logo ?
-                                    `<img src="${data.logo}" alt="${data.name}" class="w-full h-full object-cover">` :
-                                    `<i class="fas fa-tag text-gray-400"></i>`
-                                }
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <p class="font-medium text-gray-900 truncate">${data.name}</p>
-                                ${data.description ?
-                                    `<p class="text-sm text-gray-500 truncate">${data.description}</p>` : ''
-                                }
-                            </div>
+                        <div class="min-w-0">
+                            <p class="font-medium text-gray-900 truncate">${data.name}</p>
+                            ${data.description ?
+                                `<p class="text-sm text-gray-500 truncate">${data.description}</p>` : ''
+                            }
                         </div>
                     `;
                         }
@@ -1456,12 +1401,11 @@
             document.getElementById('submitText').textContent = 'Save Brand';
             document.getElementById('brandForm').reset();
             document.getElementById('brandId').value = '';
-            document.getElementById('logoPreview').innerHTML = '<i class="fas fa-image text-gray-400 text-2xl"></i>';
             document.getElementById('status').checked = true;
             document.getElementById('featured').checked = false;
 
             // Clear errors
-            ['nameError', 'slugError', 'logoError'].forEach(errorId => {
+            ['nameError', 'slugError'].forEach(errorId => {
                 const errorElement = document.getElementById(errorId);
                 if (errorElement) {
                     errorElement.classList.add('hidden');
@@ -1476,199 +1420,6 @@
         function closeBrandModal() {
             document.getElementById('brandModal').classList.add('hidden');
         }
-
-        // Media Modal Variables
-        let currentMediaMode = 'logo';
-        let selectedMediaImage = null;
-        let currentMediaData = null;
-
-        // Open media modal
-        function openMediaModal(mode = 'logo') {
-            currentMediaMode = mode;
-            selectedMediaImage = null;
-
-            // Set modal title based on mode
-            const modalTitle = 'Select Brand Logo Image';
-            document.getElementById('modal-title').textContent = modalTitle;
-
-            // Show modal
-            document.getElementById('media-modal').classList.remove('hidden');
-            document.body.classList.add('overflow-hidden');
-
-            // Load media
-            loadMediaFiles(1);
-        }
-
-        // Close media modal
-        function closeMediaModal() {
-            document.getElementById('media-modal').classList.add('hidden');
-            document.body.classList.remove('overflow-hidden');
-            selectedMediaImage = null;
-            currentMediaMode = 'logo';
-        }
-
-        // Load media files
-        async function loadMediaFiles(page = 1, search = '') {
-            const grid = document.getElementById('media-grid');
-            const pagination = document.getElementById('media-pagination');
-
-            grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-500">Loading media...</div>';
-
-            try {
-                const response = await axiosInstance.get('{{ route('admin.media.data') }}', {
-                    params: { page, search }
-                });
-
-                if (response.data.success) {
-                    const mediaItems = response.data.data?.data || [];
-                    const meta = response.data.data?.meta || response.data.meta || {};
-                    
-                    currentMediaData = response.data.data;
-                    renderMediaGrid(mediaItems);
-                    renderMediaPagination(meta);
-                }
-            } catch (error) {
-                console.error('Media load error:', error);
-                grid.innerHTML = '<div class="col-span-full text-center py-10 text-red-500">Error loading media.</div>';
-                toastr.error('Failed to load media');
-            }
-        }
-
-        // Render media grid
-        function renderMediaGrid(media) {
-            const grid = document.getElementById('media-grid');
-
-            if (!media || media.length === 0) {
-                grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-500">No media found.</div>';
-                return;
-            }
-
-            let html = '';
-            media.forEach(item => {
-                const isSelected = selectedMediaImage && selectedMediaImage.id === item.id;
-                html += `
-                <div class="relative border rounded-lg overflow-hidden cursor-pointer group ${isSelected ? 'ring-2 ring-blue-500' : ''}"
-                     onclick="toggleMediaSelection(${item.id}, '${item.url || item.path}')">
-                    <img src="${item.url || item.path}" class="w-full h-32 object-cover">
-                    <div class="p-2 text-xs truncate">${item.filename || item.name}</div>
-                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition"></div>
-                    ${isSelected ?
-                        '<div class="absolute top-2 right-2 bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center">✓</div>'
-                        : ''}
-                </div>
-                `;
-            });
-
-            grid.innerHTML = html;
-        }
-
-        // Render media pagination
-        function renderMediaPagination(meta) {
-            const pagination = document.getElementById('media-pagination');
-            if (!meta || meta.last_page <= 1) {
-                pagination.innerHTML = '';
-                return;
-            }
-
-            let html = '<div class="flex gap-2">';
-            const currentPage = meta.current_page;
-            const lastPage = meta.last_page;
-
-            for (let i = 1; i <= lastPage; i++) {
-                const active = (i === currentPage) ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700';
-                html += `
-                <button type="button" onclick="loadMediaFiles(${i}, document.getElementById('media-search').value)"
-                        class="px-3 py-1 rounded ${active} hover:bg-blue-600 hover:text-white transition">
-                    ${i}
-                </button>
-                `;
-            }
-
-            html += '</div>';
-            pagination.innerHTML = html;
-        }
-
-        // Toggle media selection
-        function toggleMediaSelection(id, url) {
-            // Single selection mode
-            selectedMediaImage = { id, url };
-
-            // Re-render grid with updated selection
-            if (currentMediaData && currentMediaData.data) {
-                renderMediaGrid(currentMediaData.data);
-            }
-        }
-
-        // Confirm media selection
-        function confirmMediaSelection() {
-            if (!selectedMediaImage) {
-                toastr.warning('Please select an image');
-                return;
-            }
-
-            const { id, url } = selectedMediaImage;
-
-            // Update the hidden input and preview
-            document.getElementById('logo_url').value = url;
-            const preview = document.getElementById('logoPreview');
-            if (preview) {
-                preview.innerHTML = `<img src="${url}" alt="Logo preview" class="w-full h-full object-cover">`;
-            }
-
-            closeMediaModal();
-            toastr.success('Image selected successfully');
-        }
-
-        // Handle media upload
-        async function handleMediaUpload(event) {
-            const files = event.target.files;
-            if (!files.length) return;
-
-            const formData = new FormData();
-            for (let i = 0; i < files.length; i++) {
-                formData.append('files[]', files[i]);
-            }
-
-            try {
-                const response = await axiosInstance.post('{{ route('admin.media.upload') }}', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' }
-                });
-
-                toastr.success('Files uploaded successfully');
-                loadMediaFiles(1); // Reload media grid
-                event.target.value = ''; // Reset file input
-            } catch (error) {
-                console.error('Upload error:', error);
-                toastr.error('Failed to upload files');
-            }
-        }
-
-        // Setup media upload listener
-        document.addEventListener('DOMContentLoaded', function() {
-            const mediaUploadInput = document.getElementById('media-upload');
-            if (mediaUploadInput) {
-                mediaUploadInput.addEventListener('change', handleMediaUpload);
-            }
-
-            // Debounced search
-            const mediaSearch = document.getElementById('media-search');
-            if (mediaSearch) {
-                let searchTimeout;
-                mediaSearch.addEventListener('input', function(e) {
-                    clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(() => {
-                        loadMediaFiles(1, e.target.value);
-                    }, 500);
-                });
-
-                // Handle Enter key in search
-                mediaSearch.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        loadMediaFiles(1, this.value);
-                    }
-                });
-            }
-        });
 
 
         // Save brand (create or update)
@@ -1695,7 +1446,7 @@
             submitBtn.disabled = true;
 
             // Clear previous errors
-            ['nameError', 'slugError', 'logoError'].forEach(errorId => {
+            ['nameError', 'slugError'].forEach(errorId => {
                 const errorElement = document.getElementById(errorId);
                 if (errorElement) {
                     errorElement.classList.add('hidden');
@@ -1770,17 +1521,6 @@
                     document.getElementById('featured').checked = brand.featured === true || brand.featured === 'true';
                     document.getElementById('status').checked = brand.status === 'active';
 
-                    // Set logo preview
-                    const preview = document.getElementById('logoPreview');
-                    if (brand.logo) {
-                        document.getElementById('logo_url').value = brand.logo;
-                        preview.innerHTML =
-                            `<img src="${brand.logo}" alt="${brand.name}" class="w-full h-full object-cover">`;
-                    } else {
-                        document.getElementById('logo_url').value = '';
-                        preview.innerHTML = '<i class="fas fa-image text-gray-400 text-2xl"></i>';
-                    }
-
                     // Update UI
                     document.getElementById('modalTitle').textContent = 'Edit Brand';
                     document.getElementById('submitText').textContent = 'Update Brand';
@@ -1800,15 +1540,10 @@
                 if (response.data.success) {
                     const brand = response.data.data;
 
-                    let logoHtml = brand.logo ?
-                        `<img src="${brand.logo}" alt="${brand.name}" class="w-24 h-24 rounded-lg object-cover mb-4">` :
-                        '';
-
                     Swal.fire({
                         title: brand.name,
                         html: `
                     <div class="text-left">
-                        ${logoHtml}
                         <p class="mb-3"><strong>Description:</strong> ${brand.description || 'No description'}</p>
                         <p class="mb-3"><strong>Website:</strong> ${brand.website ? `<a href="${brand.website}" target="_blank" class="text-indigo-600">${brand.website}</a>` : 'N/A'}</p>
                         <p class="mb-3"><strong>Email:</strong> ${brand.email || 'N/A'}</p>
@@ -2037,5 +1772,71 @@
                 toastr.error('Failed to refresh data');
             }
         }
+
+        // Export dropdown click handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const exportBtn = document.getElementById('brandsExportBtn');
+            const exportDropdown = document.getElementById('brandsExportDropdown');
+
+            if (exportBtn && exportDropdown) {
+                // Toggle dropdown on button click
+                exportBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    exportDropdown.classList.toggle('hidden');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function(e) {
+                    if (!exportBtn.contains(e.target) && !exportDropdown.contains(e.target)) {
+                        exportDropdown.classList.add('hidden');
+                    }
+                });
+
+                // Handle export option clicks
+                const exportOptions = exportDropdown.querySelectorAll('[data-export]');
+                exportOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        const format = this.getAttribute('data-export');
+                        console.log('Export clicked:', format);
+                        
+                        // Check if brandsTable exists
+                        if (typeof brandsTable === 'undefined') {
+                            console.error('brandsTable is not defined');
+                            toastr.error('Export table not initialized');
+                            exportDropdown.classList.add('hidden');
+                            return;
+                        }
+                        
+                        // Trigger the export based on format
+                        try {
+                            switch (format) {
+                                case 'csv':
+                                    console.log('Downloading CSV...');
+                                    brandsTable.download("csv", "brands.csv");
+                                    toastr.success('CSV export started');
+                                    break;
+                                case 'xlsx':
+                                    console.log('Downloading Excel...');
+                                    brandsTable.download("xlsx", "brands.xlsx", {
+                                        sheetName: "Brands"
+                                    });
+                                    toastr.success('Excel export started');
+                                    break;
+                                case 'print':
+                                    console.log('Opening print dialog...');
+                                    window.print();
+                                    break;
+                            }
+                        } catch (error) {
+                            console.error('Export error:', error);
+                            toastr.error('Export failed: ' + error.message);
+                        }
+                        
+                        // Close dropdown after export
+                        exportDropdown.classList.add('hidden');
+                    });
+                });
+            }
+        });
     </script>
 @endpush
