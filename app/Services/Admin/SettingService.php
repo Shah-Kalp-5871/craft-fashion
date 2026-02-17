@@ -245,6 +245,17 @@ class SettingService
                     'is_encrypted' => false,
                     'is_public' => true,
                     'sort_order' => 50
+                ],
+                [
+                    'key' => 'store_pincode',
+                    'label' => 'Pincode / Zip Code',
+                    'value' => '135001',
+                    'type' => 'text',
+                    'default' => '135001',
+                    'description' => 'Store location pincode',
+                    'is_encrypted' => false,
+                    'is_public' => true,
+                    'sort_order' => 60
                 ]
             ],
             'seo' => [

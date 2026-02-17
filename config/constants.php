@@ -2,7 +2,7 @@
 
 return [
     'SITE_NAME' => 'Craft Fashion',
-    'SITE_EMAIL' => 'info@craftfashion.com',
+    'SITE_EMAIL' => 'aarasabina@gmail.com',
     'SITE_PHONE' => '+91 9588181384',
     'SITE_ADDRESS' => '123 Fashion Street',
     'SITE_PINCODE' => '135001',
