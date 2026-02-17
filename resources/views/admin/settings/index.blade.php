@@ -35,14 +35,14 @@
                     <i class="fas fa-search w-5 h-5"></i>
                     SEO Settings
                 </button>
-                <button data-tab="payment" class="tab-btn w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all">
+                <!-- <button data-tab="payment" class="tab-btn w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all">
                     <i class="fas fa-credit-card w-5 h-5"></i>
                     Payment Gateways
-                </button>
-                <button data-tab="shipping" class="tab-btn w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all">
+                </button> -->
+                <!-- <button data-tab="shipping" class="tab-btn w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all">
                     <i class="fas fa-truck w-5 h-5"></i>
                     Shipping & Tax
-                </button>
+                </button> -->
                 <button data-tab="social" class="tab-btn w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl transition-all">
                     <i class="fas fa-share-alt w-5 h-5"></i>
                     Social Media
