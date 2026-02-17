@@ -121,13 +121,13 @@ Route::prefix('admin')->group(function () {
         Route::prefix('orders')->name('admin.orders.')->group(function () {
             Route::get('/', [AdminOrder::class, 'index'])->name('index');
             Route::get('/data', [AdminOrder::class, 'getOrders'])->name('data');
-            Route::get('/export', [AdminOrder::class, 'export'])->name('export');
             Route::get('/{order}', [AdminOrder::class, 'view'])->name('view');
             Route::post('/{order}/update-status', [AdminOrder::class, 'updateStatus'])->name('update-status');
             Route::post('/{order}/update-payment-status', [AdminOrder::class, 'updatePaymentStatus'])->name('update-payment-status');
             Route::post('/{order}/update-tracking', [AdminOrder::class, 'updateTracking'])->name('update-tracking');
             Route::delete('/{order}', [AdminOrder::class, 'destroy'])->name('destroy');
             Route::post('/bulk-delete', [AdminOrder::class, 'bulkDelete'])->name('bulk-delete');
+            Route::get('/export', [AdminOrder::class, 'export'])->name('export');
             Route::get('/{order}/invoice', [AdminOrder::class, 'printInvoice'])->name('invoice');
         });
 

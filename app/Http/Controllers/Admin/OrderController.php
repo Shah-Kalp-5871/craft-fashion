@@ -277,20 +277,23 @@ class OrderController extends Controller
     /**
      * Export orders
      */
+    /**
+     * Export orders
+     */
     public function export(Request $request)
     {
         $query = Order::with(['customer', 'items']);
 
         // Apply filters
-        if ($request->has('status')) {
+        if ($request->has('status') && !empty($request->status)) {
             $query->where('status', $request->status);
         }
 
-        if ($request->has('payment_status')) {
+        if ($request->has('payment_status') && !empty($request->payment_status)) {
             $query->where('payment_status', $request->payment_status);
         }
 
-        if ($request->has('search')) {
+        if ($request->has('search') && !empty($request->search)) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('order_number', 'like', "%{$search}%")
@@ -302,8 +305,14 @@ class OrderController extends Controller
             });
         }
 
-        $orders = $query->get()->map(function ($order) {
-            return [
+        $orders = $query->latest()->get();
+        $format = $request->input('export', 'csv');
+        $fileName = 'orders_' . date('Y-m-d_H-i');
+
+
+        $data = [];
+        foreach ($orders as $order) {
+            $data[] = [
                 'Order ID' => $order->order_number,
                 'Customer' => $order->customer->name ?? 'N/A',
                 'Email' => $order->customer->email ?? 'N/A',
@@ -316,7 +325,6 @@ class OrderController extends Controller
                     'online' => 'Online Payment',
                     default => 'N/A',
                 },
-
                 'Items Count' => $order->items->count(),
                 'Subtotal' => number_format((float) $order->subtotal, 2),
                 'Tax' => number_format((float) $order->tax_total, 2),
@@ -325,32 +333,80 @@ class OrderController extends Controller
                 'Grand Total' => number_format((float) $order->grand_total, 2),
                 'Shipping Address' => $order->shipping_address ? implode(', ', array_filter($order->shipping_address)) : 'N/A',
             ];
-        });
+        }
 
-        $filename = 'orders_' . date('Y-m-d_H-i') . '.csv';
+        if ($format === 'excel') {
+            return $this->exportExcel($data, $fileName);
+        } else {
+            return $this->exportCSV($data, $fileName);
+        }
+    }
 
-        $headers = array(
+    private function exportCSV($data, $fileName)
+    {
+        $headers = [
             "Content-type" => "text/csv",
-            "Content-Disposition" => "attachment; filename=$filename",
+            "Content-Disposition" => "attachment; filename={$fileName}.csv",
             "Pragma" => "no-cache",
             "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
             "Expires" => "0"
-        );
+        ];
 
-        $callback = function () use ($orders) {
+        $callback = function () use ($data) {
             $file = fopen('php://output', 'w');
+            
+            // Add BOM for Excel compatibility
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
 
-            // Add CSV headers
-            if (count($orders) > 0) {
-                fputcsv($file, array_keys($orders[0]));
+            if (!empty($data)) {
+                fputcsv($file, array_keys($data[0]));
+                foreach ($data as $row) {
+                    fputcsv($file, $row);
+                }
             }
-
-            // Add data rows
-            foreach ($orders as $row) {
-                fputcsv($file, $row);
-            }
-
             fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    private function exportExcel($data, $fileName)
+    {
+        $headers = [
+            "Content-Type" => "application/vnd.ms-excel",
+            "Content-Disposition" => "attachment; filename={$fileName}.xls",
+            "Pragma" => "no-cache",
+            "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+            "Expires" => "0"
+        ];
+
+        $callback = function () use ($data) {
+            echo "<html>";
+            echo "<head><meta charset='utf-8'></head>";
+            echo "<body>";
+            echo "<table border='1'>";
+            
+            if (!empty($data)) {
+                // Headings
+                echo "<tr>";
+                foreach (array_keys($data[0]) as $key) {
+                    echo "<th style='background-color: #f3f4f6; font-weight: bold;'>{$key}</th>";
+                }
+                echo "</tr>";
+
+                // Rows
+                foreach ($data as $row) {
+                    echo "<tr>";
+                    foreach ($row as $value) {
+                        echo "<td>{$value}</td>";
+                    }
+                    echo "</tr>";
+                }
+            }
+            
+            echo "</table>";
+            echo "</body>";
+            echo "</html>";
         };
 
         return response()->stream($callback, 200, $headers);
