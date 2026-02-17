@@ -1624,7 +1624,12 @@
                     });
 
                     if (response.data.success) {
-                        toastr.success(`Brand ${isActive ? 'activated' : 'deactivated'} successfully!`);
+                        const productsCount = response.data.data.products_updated || 0;
+                        const statusText = isActive ? 'activated' : 'deactivated';
+                        const message = productsCount > 0 
+                            ? `Brand ${statusText} successfully! ${productsCount} product(s) also ${statusText}.`
+                            : `Brand ${statusText} successfully!`;
+                        toastr.success(message);
                         loadBrandsData();
                     } else {
                         toastr.error('Failed to update brand status');

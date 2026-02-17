@@ -236,7 +236,10 @@ class ProductService
                             ]);
                     },
                 ])
-                ->where('products.status', 'active');
+                ->where('products.status', 'active')
+                ->whereHas('brand', function ($q) {
+                    $q->where('status', 1); // Only show products from active brands
+                });
 
             // Search filter
             if (!empty($filters['search'])) {
@@ -530,6 +533,9 @@ class ProductService
             ])
                 ->where('slug', $slug)
                 ->where('status', 'active')
+                ->whereHas('brand', function ($q) {
+                    $q->where('status', 1); // Only show products from active brands
+                })
                 ->firstOrFail();
 
             return $this->transformProductForDetails($product);
@@ -775,6 +781,9 @@ class ProductService
                         ->orWhereHas('categories', function ($q) use ($product) {
                             $q->whereIn('categories.id', $product->categories->pluck('id'));
                         });
+                })
+                ->whereHas('brand', function ($q) {
+                    $q->where('status', 1); // Only show products from active brands
                 })
                 ->limit($limit)
                 ->get();

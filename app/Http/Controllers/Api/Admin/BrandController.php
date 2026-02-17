@@ -441,14 +441,25 @@ class BrandController extends Controller
                 return $this->apiResponse(false, null, 'Brand not found', 404);
             }
 
+            $newStatus = $request->status === 'active' ? 1 : 0;
+            
+            // Update brand status
             $brand->update([
-                'status' => $request->status === 'active' ? 1 : 0,
+                'status' => $newStatus,
             ]);
+
+            // Cascade status change to all products of this brand
+            $productsUpdated = \App\Models\Product::where('brand_id', $brand->id)
+                ->update(['status' => $request->status]);
+
+            // Clear customer product filters cache so brand appears/disappears immediately
+            \Cache::forget('all_products_filters_' . config('app.locale'));
 
             return $this->apiResponse(true, [
                 'id' => $brand->id,
                 'status' => $brand->status ? 'active' : 'inactive',
-            ], 'Brand status updated successfully');
+                'products_updated' => $productsUpdated,
+            ], "Brand status updated successfully. {$productsUpdated} product(s) also updated.");
 
         } catch (\Exception $e) {
             \Log::error('Brand status update error: ' . $e->getMessage());
