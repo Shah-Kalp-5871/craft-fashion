@@ -94,9 +94,7 @@
                         <button id="taxBulkToggleBtn" class="btn-secondary">
                             <i class="fas fa-toggle-on mr-2"></i>Bulk Status
                         </button>
-                        <button id="taxColumnVisibilityBtn" class="btn-secondary">
-                            <i class="fas fa-columns mr-2"></i>Columns
-                        </button>
+
                         <div class="relative group">
                             <button id="taxExportBtn" class="btn-primary">
                                 <i class="fas fa-file-export mr-2"></i>Export
@@ -983,55 +981,7 @@
                 }, 500);
             });
 
-            // Column visibility
-            const columnVisibilityBtn = document.getElementById('taxColumnVisibilityBtn');
-            if (columnVisibilityBtn) {
-                const columnMenu = document.createElement('div');
-                columnMenu.className =
-                    'absolute mt-12 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 hidden right-12 md:right-24 md:left-auto left-0';
 
-                const columns = taxesTable.getColumnDefinitions();
-
-                columns.forEach((column, index) => {
-                    if (index === 0) return; // skip checkbox column
-
-                    const field = column.field;
-                    if (!field) return;
-
-                    const columnBtn = document.createElement('button');
-                    columnBtn.className =
-                        'w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-50 text-sm flex items-center';
-                    columnBtn.innerHTML = `
-                        <input type="checkbox" class="mr-2" ${taxesTable.getColumn(field).isVisible() ? 'checked' : ''}>
-                        ${column.title}
-                    `;
-
-                    columnBtn.addEventListener('click', function(e) {
-                        e.stopPropagation();
-                        const col = taxesTable.getColumn(field);
-                        const checkbox = this.querySelector('input');
-                        col.toggle();
-                        setTimeout(() => {
-                            checkbox.checked = col.isVisible();
-                        }, 10);
-                    });
-
-                    columnMenu.appendChild(columnBtn);
-                });
-
-                columnVisibilityBtn.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    columnMenu.classList.toggle('hidden');
-                });
-
-                document.addEventListener('click', function(e) {
-                    if (!columnMenu.contains(e.target) && e.target !== columnVisibilityBtn) {
-                        columnMenu.classList.add('hidden');
-                    }
-                });
-
-                columnVisibilityBtn.parentElement.appendChild(columnMenu);
-            }
 
             // Export functionality
             const exportBtns = document.querySelectorAll('#taxExportBtn ~ [data-export]');
