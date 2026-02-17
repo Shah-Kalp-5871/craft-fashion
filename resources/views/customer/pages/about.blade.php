@@ -167,7 +167,7 @@
                     <i class="fas fa-arrow-down ml-2"></i>
                 </a>
 
-                <a href="https://wa.me/919876543210"
+                <a href="{{ config('constants.WHATSAPP_LINK') }}"
                     class="bg-white text-dark px-8 py-4 rounded-full font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl border border-primary/20 inline-flex items-center justify-center">
                     <i class="fab fa-whatsapp mr-2 text-primary"></i>
                     <span>Chat With Us</span>
@@ -328,7 +328,7 @@
                             </div>
 
                             <div class="flex items-center space-x-6 mt-8">
-                                <a href="https://wa.me/919876543210"
+                                <a href="{{ config('constants.WHATSAPP_LINK') }}"
                                     class="bg-primary text-white px-6 py-3 rounded-full font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-primary/90 inline-flex items-center">
                                     <i class="fab fa-whatsapp mr-2"></i>
                                     <span>Connect With Priya</span>
@@ -396,8 +396,8 @@
                                 </div>
                                 <div>
                                     <h4 class="font-bold text-dark text-lg mb-1">Contact Us</h4>
-                                    <a href="tel:+919876543210"
-                                        class="text-secondary hover:text-primary transition">+91 9876543210</a>
+                                    <a href="tel:{{ str_replace([' ', '+'], '', config('constants.SITE_PHONE')) }}"
+                                        class="text-secondary hover:text-primary transition">{{ config('constants.SITE_PHONE') }}</a>
                                     <p class="text-sm text-primary mt-1">Call for appointments or queries</p>
                                 </div>
                             </div>
@@ -469,7 +469,7 @@
                         <div class="bg-primary text-white rounded-2xl p-6 text-center">
                             <h4 class="font-bold text-lg mb-2">Ready to Visit?</h4>
                             <p class="mb-4">Book a personal styling session or just drop by!</p>
-                            <a href="https://wa.me/919876543210?text=I'd like to visit your store. What's the best time to come?"
+                            <a href="{{ config('constants.WHATSAPP_LINK') }}?text=I'd like to visit your store. What's the best time to come?"
                                 class="bg-white text-primary px-6 py-3 rounded-full font-semibold transition-all hover:scale-105 inline-flex items-center">
                                 <i class="fab fa-whatsapp mr-2"></i>
                                 Confirm Visit Timing
@@ -503,7 +503,7 @@
                 <i class="fas fa-shopping-bag ml-3 group-hover:scale-110 transition-transform"></i>
             </a>
 
-            <a href="https://wa.me/919876543210"
+            <a href="{{ config('constants.WHATSAPP_LINK') }}"
                 class="group bg-primary text-white px-8 py-4 rounded-full font-bold text-lg transition-all duration-300 hover:scale-105 hover:shadow-2xl inline-flex items-center justify-center border-2 border-primary/30">
                 <i class="fab fa-whatsapp mr-3 text-xl"></i>
                 <span>Get Personal Advice</span>
