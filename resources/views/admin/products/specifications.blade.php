@@ -2564,7 +2564,7 @@
                     tr:nth-child(even) { background-color: #f9f9f9; }
                     .print-info { margin-bottom: 20px; color: #666; }
                 </style>
-            </head>
+            <\/head>
             <body>
                 <h1>${title} Report</h1>
                 <div class="print-info">
@@ -2628,7 +2628,7 @@
                     </tbody>
                 </table>
             </body>
-            </html>
+            <\/html>
         `;
 
         printWindow.document.write(html);
