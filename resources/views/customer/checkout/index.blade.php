@@ -349,6 +349,11 @@
                         </div>
 
                         <div class="flex justify-between items-center py-2">
+                            <span class="text-secondary">Tax Total</span>
+                            <span id="summary-tax" class="font-semibold text-dark">₹{{ number_format($cart['tax_total'] ?? 0, 2) }}</span>
+                        </div>
+
+                        <div class="flex justify-between items-center py-2">
                             <span class="text-secondary">Shipping</span>
                             <span class="font-semibold text-dark shipping-cost">
                                 @if(($cart['shipping_total'] ?? 0) == 0)
@@ -450,13 +455,18 @@
         const discount = {{ $cart['discount_total'] ?? 0 }};
         const tax = {{ $cart['tax_total'] ?? 0 }};
         
-        const updateSummary = (shippingCost) => {
+        const updateSummary = (shippingCost, taxAmount = tax) => {
             const shippingEl = document.querySelector('.shipping-cost');
+            const taxEl = document.getElementById('summary-tax');
             const totalEl = document.querySelector('.total-amount');
             const payBtnText = document.querySelector('#pay-now-btn span');
             
-            const total = subtotal + tax + shippingCost - discount;
+            const total = subtotal + taxAmount + shippingCost - discount;
             
+            if (taxEl) {
+                taxEl.textContent = '₹' + taxAmount.toLocaleString('en-IN', {minimumFractionDigits: 2});
+            }
+
             if (shippingCost === 0) {
                 shippingEl.innerHTML = '<span class="text-green-500">FREE</span>';
             } else {
