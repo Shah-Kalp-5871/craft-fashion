@@ -55,9 +55,11 @@
                         </button>
                     </form> --}}
                 @endif
+                @if($order->status != 'cancelled')
                 <a href="{{ route('customer.account.orders.download-invoice', $order->id) }}" class="bg-primary text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-primary/90 transition shadow-sm flex items-center">
                     <i class="fas fa-download mr-2"></i> Download Invoice
                 </a>
+                @endif
             </div>
         </div>
 
