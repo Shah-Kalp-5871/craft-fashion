@@ -257,11 +257,6 @@
              @endauth
         </div>
         
-        <div class="border-t border-gray-100 pt-2 pb-2">
-            <a href="{{ config('constants.WHATSAPP_LINK') }}" class="flex items-center py-2 text-green-600 hover:text-green-700 font-medium">
-                <i class="fab fa-whatsapp text-xl mr-2"></i>
-                Chat on WhatsApp
-            </a>
-        </div>
+
     </div>
 </nav>
