@@ -441,10 +441,19 @@ class CategoryController extends Controller
 
             $category->update(['status' => $status]);
 
+            // Cascade status change to all products in this category
+            $statusString = $status ? 'active' : 'inactive';
+            $productsUpdated = \App\Models\Product::where('main_category_id', $category->id)
+                ->update(['status' => $statusString]);
+
+            // Clear customer product filters cache so category appears/disappears immediately
+            \Cache::forget('all_products_filters_' . config('app.locale'));
+
             return $this->apiResponse(true, [
                 'id' => $category->id,
                 'status' => (bool) $category->status,
-            ], 'Category status updated successfully');
+                'products_updated' => $productsUpdated,
+            ], "Category status updated successfully. {$productsUpdated} product(s) also updated.");
 
         } catch (\Exception $e) {
             \Log::error('Category status update error: ' . $e->getMessage());
