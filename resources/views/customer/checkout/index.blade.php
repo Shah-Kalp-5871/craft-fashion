@@ -314,8 +314,8 @@
             </div>
 
             <!-- Order Summary -->
-            <div data-aos="fade-left">
-                <div class="bg-white rounded-3xl shadow-lg border border-primary/10 p-4 md:p-8 sticky top-6">
+            <div data-aos="fade-left" class="sticky top-24 h-fit">
+                <div class="bg-white rounded-3xl shadow-lg border border-primary/10 p-4 md:p-8">
                     <div class="flex items-center mb-6">
                         <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mr-4">
                             <i class="fas fa-shopping-bag text-primary text-xl"></i>

@@ -192,8 +192,8 @@
                 </div>
                 
                 <!-- Order Summary -->
-                <div class="lg:col-span-1">
-                    <div class="bg-white rounded-2xl sm:rounded-3xl shadow-lg border border-primary/10 p-4 sm:p-6 lg:sticky lg:top-6" data-aos="fade-left">
+                <div class="lg:col-span-1 lg:sticky lg:top-24 h-fit">
+                    <div class="bg-white rounded-2xl sm:rounded-3xl shadow-lg border border-primary/10 p-4 sm:p-6" data-aos="fade-left">
                         <h2 class="text-xl sm:text-2xl font-bold font-playfair text-dark mb-4 sm:mb-6">Order Summary</h2>
                         
                         <!-- Pricing Breakdown -->
