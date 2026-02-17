@@ -186,11 +186,10 @@
                                 <i class="fas fa-image text-gray-400 text-2xl"></i>
                             </div>
                             <div class="flex-1">
-                                <input type="file" id="logo" name="logo" accept="image/*" class="hidden"
-                                    onchange="previewLogo(event)">
-                                <button type="button" onclick="document.getElementById('logo').click()"
+                                <input type="hidden" id="logo_url" name="logo_url">
+                                <button type="button" onclick="openMediaModal('logo')"
                                     class="btn-secondary mb-2">
-                                    <i class="fas fa-upload mr-2"></i>Upload Logo
+                                    <i class="fas fa-upload mr-2"></i>Select from Media
                                 </button>
                                 <p class="text-xs text-gray-500">Recommended: 300x300px, JPG, PNG, or WebP. Max 2MB.</p>
                                 <div id="logoError" class="hidden mt-2 text-sm text-rose-600"></div>
@@ -355,6 +354,54 @@
                     class="w-full btn-secondary text-left border-rose-200 text-rose-600 hover:bg-rose-50">
                     <i class="fas fa-trash mr-2"></i>Delete Selected
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Media Modal -->
+    <div id="media-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeMediaModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">Select Media</h3>
+                        <button type="button" onclick="closeMediaModal()" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                            <span class="sr-only">Close</span>
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="flex flex-col md:flex-row justify-between mb-4 space-y-2 md:space-y-0">
+                        <input type="text" id="media-search" placeholder="Search files..." class="border rounded px-3 py-2 w-full md:w-1/3">
+                        <div class="flex items-center space-x-2">
+                            <label class="cursor-pointer bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded shadow transition">
+                                <span>Upload New</span>
+                                <input type="file" id="media-upload" class="hidden" multiple accept="image/*">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div id="media-grid" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 max-h-96 overflow-y-auto p-2 border rounded">
+                        <!-- Loaded dynamically -->
+                        <div class="col-span-full text-center py-10 text-gray-500">Loading media...</div>
+                    </div>
+
+                    <div id="media-pagination" class="mt-4 flex justify-between items-center">
+                        <!-- Pagination links -->
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="media-select-btn" onclick="confirmMediaSelection()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 sm:ml-3 sm:w-auto sm:text-sm disabled:opacity-50">
+                        Select
+                    </button>
+                    <button type="button" onclick="closeMediaModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1449,22 +1496,199 @@
             document.getElementById('brandModal').classList.add('hidden');
         }
 
-        // Preview logo
-        function previewLogo(event) {
-            const input = event.target;
-            const preview = document.getElementById('logoPreview');
+        // Media Modal Variables
+        let currentMediaMode = 'logo';
+        let selectedMediaImage = null;
+        let currentMediaData = null;
 
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
+        // Open media modal
+        function openMediaModal(mode = 'logo') {
+            currentMediaMode = mode;
+            selectedMediaImage = null;
 
-                reader.onload = function(e) {
-                    preview.innerHTML =
-                        `<img src="${e.target.result}" alt="Logo preview" class="w-full h-full object-cover">`;
+            // Set modal title based on mode
+            const modalTitle = 'Select Brand Logo Image';
+            document.getElementById('modal-title').textContent = modalTitle;
+
+            // Show modal
+            document.getElementById('media-modal').classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+
+            // Load media
+            loadMediaFiles(1);
+        }
+
+        // Close media modal
+        function closeMediaModal() {
+            document.getElementById('media-modal').classList.add('hidden');
+            document.body.classList.remove('overflow-hidden');
+            selectedMediaImage = null;
+            currentMediaMode = 'logo';
+        }
+
+        // Load media files
+        async function loadMediaFiles(page = 1, search = '') {
+            const grid = document.getElementById('media-grid');
+            const pagination = document.getElementById('media-pagination');
+
+            grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-500">Loading media...</div>';
+
+            try {
+                const response = await axiosInstance.get('{{ route('admin.media.data') }}', {
+                    params: { page, search }
+                });
+
+                if (response.data.success) {
+                    const mediaItems = response.data.data?.data || [];
+                    const meta = response.data.data?.meta || response.data.meta || {};
+                    
+                    currentMediaData = response.data.data;
+                    renderMediaGrid(mediaItems);
+                    renderMediaPagination(meta);
                 }
-
-                reader.readAsDataURL(input.files[0]);
+            } catch (error) {
+                console.error('Media load error:', error);
+                grid.innerHTML = '<div class="col-span-full text-center py-10 text-red-500">Error loading media.</div>';
+                toastr.error('Failed to load media');
             }
         }
+
+        // Render media grid
+        function renderMediaGrid(media) {
+            const grid = document.getElementById('media-grid');
+
+            if (!media || media.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center py-10 text-gray-500">No media found.</div>';
+                return;
+            }
+
+            let html = '';
+            media.forEach(item => {
+                const isSelected = selectedMediaImage && selectedMediaImage.id === item.id;
+                html += `
+                <div class="relative border rounded-lg overflow-hidden cursor-pointer group ${isSelected ? 'ring-2 ring-blue-500' : ''}"
+                     onclick="toggleMediaSelection(${item.id}, '${item.url || item.path}')">
+                    <img src="${item.url || item.path}" class="w-full h-32 object-cover">
+                    <div class="p-2 text-xs truncate">${item.filename || item.name}</div>
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition"></div>
+                    ${isSelected ?
+                        '<div class="absolute top-2 right-2 bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center">✓</div>'
+                        : ''}
+                </div>
+                `;
+            });
+
+            grid.innerHTML = html;
+        }
+
+        // Render media pagination
+        function renderMediaPagination(meta) {
+            const pagination = document.getElementById('media-pagination');
+            if (!meta || meta.last_page <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let html = '<div class="flex gap-2">';
+            const currentPage = meta.current_page;
+            const lastPage = meta.last_page;
+
+            for (let i = 1; i <= lastPage; i++) {
+                const active = (i === currentPage) ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-700';
+                html += `
+                <button type="button" onclick="loadMediaFiles(${i}, document.getElementById('media-search').value)"
+                        class="px-3 py-1 rounded ${active} hover:bg-blue-600 hover:text-white transition">
+                    ${i}
+                </button>
+                `;
+            }
+
+            html += '</div>';
+            pagination.innerHTML = html;
+        }
+
+        // Toggle media selection
+        function toggleMediaSelection(id, url) {
+            // Single selection mode
+            selectedMediaImage = { id, url };
+
+            // Re-render grid with updated selection
+            if (currentMediaData && currentMediaData.data) {
+                renderMediaGrid(currentMediaData.data);
+            }
+        }
+
+        // Confirm media selection
+        function confirmMediaSelection() {
+            if (!selectedMediaImage) {
+                toastr.warning('Please select an image');
+                return;
+            }
+
+            const { id, url } = selectedMediaImage;
+
+            // Update the hidden input and preview
+            document.getElementById('logo_url').value = url;
+            const preview = document.getElementById('logoPreview');
+            if (preview) {
+                preview.innerHTML = `<img src="${url}" alt="Logo preview" class="w-full h-full object-cover">`;
+            }
+
+            closeMediaModal();
+            toastr.success('Image selected successfully');
+        }
+
+        // Handle media upload
+        async function handleMediaUpload(event) {
+            const files = event.target.files;
+            if (!files.length) return;
+
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files[]', files[i]);
+            }
+
+            try {
+                const response = await axiosInstance.post('{{ route('admin.media.upload') }}', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+
+                toastr.success('Files uploaded successfully');
+                loadMediaFiles(1); // Reload media grid
+                event.target.value = ''; // Reset file input
+            } catch (error) {
+                console.error('Upload error:', error);
+                toastr.error('Failed to upload files');
+            }
+        }
+
+        // Setup media upload listener
+        document.addEventListener('DOMContentLoaded', function() {
+            const mediaUploadInput = document.getElementById('media-upload');
+            if (mediaUploadInput) {
+                mediaUploadInput.addEventListener('change', handleMediaUpload);
+            }
+
+            // Debounced search
+            const mediaSearch = document.getElementById('media-search');
+            if (mediaSearch) {
+                let searchTimeout;
+                mediaSearch.addEventListener('input', function(e) {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = setTimeout(() => {
+                        loadMediaFiles(1, e.target.value);
+                    }, 500);
+                });
+
+                // Handle Enter key in search
+                mediaSearch.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        loadMediaFiles(1, this.value);
+                    }
+                });
+            }
+        });
+
 
         // Save brand (create or update)
         async function saveBrand() {
@@ -1568,9 +1792,11 @@
                     // Set logo preview
                     const preview = document.getElementById('logoPreview');
                     if (brand.logo) {
+                        document.getElementById('logo_url').value = brand.logo;
                         preview.innerHTML =
                             `<img src="${brand.logo}" alt="${brand.name}" class="w-full h-full object-cover">`;
                     } else {
+                        document.getElementById('logo_url').value = '';
                         preview.innerHTML = '<i class="fas fa-image text-gray-400 text-2xl"></i>';
                     }
 
