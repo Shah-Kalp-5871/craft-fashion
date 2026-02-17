@@ -161,6 +161,8 @@ class LocalCartService
         // Get product variant details
         $variant = ProductVariant::with(['product.taxClass.rates', 'variantImages.media'])->find($variantId);
 
+
+
         if (!$variant) {
             throw new \Exception('Product variant not found');
         }
@@ -196,6 +198,8 @@ class LocalCartService
                 'attributes' => $attributes,
                 'image' => optional($variant->variantImages->first()->media)->file_path ??
                           optional($variant->product->images->first()->media)->file_path ?? null,
+
+
                 'stock_quantity' => $variant->stock_quantity,
                 'tax_rate' => $variant->product->taxClass ? $variant->product->taxClass->total_rate : 0,
                 'added_at' => now()->timestamp
@@ -249,7 +253,9 @@ class LocalCartService
     private function recalculateLocalCart($cart)
     {
         $subtotal = 0;
+        $taxTotal = 0;
         $itemsCount = 0;
+
 
         foreach ($cart['items'] as $item) {
             $subtotal += $item['total'];
@@ -318,6 +324,8 @@ class LocalCartService
                     'attributes' => json_decode($item->attributes, true) ?? [],
                     'image' => optional($item->productVariant->variantImages->first()->media)->file_path ??
                               optional($item->productVariant->product->images->first()->media)->file_path ?? null,
+
+
                     'stock_quantity' => $item->productVariant->stock_quantity
                 ];
             })->toArray(),

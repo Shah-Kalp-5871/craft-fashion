@@ -217,14 +217,8 @@
 
                             <div class="flex justify-between items-center py-1.5 sm:py-2">
                                 <span class="text-secondary text-sm sm:text-base">Shipping</span>
-                                <span id="summary-shipping" class="font-semibold text-sm sm:text-base {{ $shipping == 0 ? 'text-green-500' : 'text-dark' }}">
-                                    @if($shipping == 0)
-                                        <span class="flex items-center">
-                                            <i class="fas fa-check-circle mr-1 text-xs sm:text-sm"></i> FREE
-                                        </span>
-                                    @else
-                                        ₹{{ number_format($shipping, 2) }}
-                                    @endif
+                                <span id="summary-shipping" class="font-semibold text-sm sm:text-base text-dark">
+                                    Calculated at checkout
                                 </span>
                             </div>
                             
@@ -449,12 +443,9 @@ function updateSummary(cart) {
     
     const shippingEl = document.getElementById('summary-shipping');
     if (shippingEl) {
-        if (cart.shipping_total === 0) {
-            shippingEl.innerHTML = '<span class="flex items-center text-green-500"><i class="fas fa-check-circle mr-1"></i> FREE</span>';
-        } else {
-            shippingEl.textContent = formatCurrency(cart.shipping_total);
-            shippingEl.classList.remove('text-green-500');
-        }
+        shippingEl.textContent = 'Calculated at checkout';
+        shippingEl.classList.remove('text-green-500');
+        shippingEl.classList.add('text-dark');
     }
     
     const totalEl = document.getElementById('summary-total');
