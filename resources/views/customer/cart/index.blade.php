@@ -28,7 +28,7 @@
 </section>
 
 <!-- Cart Content -->
-<section class="py-8 sm:py-12 md:py-16 bg-white">
+<section class="py-8 sm:py-12 md:py-16 bg-white overflow-x-hidden">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         @if(session('message'))
             <div class="bg-green-100 border border-green-400 text-green-700 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl mb-6 sm:mb-8 flex items-start sm:items-center text-sm sm:text-base" data-aos="fade-down">
