@@ -128,7 +128,7 @@
 </section>
 
 <!-- Checkout Content -->
-<section class="py-16 bg-white">
+<section class="py-16 bg-white overflow-x-hidden">
     <div class="container mx-auto px-4">
         <!-- Progress Steps -->
         <div class="max-w-4xl mx-auto mb-8 md:mb-12 overflow-x-auto" data-aos="fade-down">
@@ -408,7 +408,7 @@
 </section>
 
 <!-- Trust Features -->
-<section class="py-16 bg-gradient-to-br from-gray-50 to-primary/5">
+<section class="py-16 bg-gradient-to-br from-gray-50 to-primary/5 overflow-x-hidden">
     <div class="container mx-auto px-4">
         <div class="max-w-4xl mx-auto text-center">
             <h2 class="text-3xl font-bold font-playfair text-dark mb-12">Why Shop With Confidence</h2>
