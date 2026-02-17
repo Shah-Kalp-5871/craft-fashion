@@ -116,7 +116,7 @@
                 Secure Checkout
             </div>
 
-            <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold font-playfair text-dark mb-4 md:mb-6 leading-tight">
+            <h1 class="text-3xl md:text-5xl lg:text-6xl font-bold font-playfair text-dark mb-4 md:mb-6 leading-tight px-4">
                 Complete Your <span class="text-primary">Order</span>
             </h1>
 
@@ -131,7 +131,7 @@
 <section class="py-16 bg-white">
     <div class="container mx-auto px-4">
         <!-- Progress Steps -->
-        <div class="max-w-4xl mx-auto mb-8 md:mb-12" data-aos="fade-down">
+        <div class="max-w-4xl mx-auto mb-8 md:mb-12 overflow-x-auto" data-aos="fade-down">
             <div class="flex items-center justify-between text-xs md:text-base">
                 <div class="flex items-center text-primary">
                     <div class="w-8 h-8 md:w-10 md:h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mr-2 md:mr-3">
@@ -144,29 +144,29 @@
                     <div class="w-8 h-8 md:w-10 md:h-10 bg-primary text-white rounded-full flex items-center justify-center font-bold mr-2 md:mr-3">
                         2
                     </div>
-                    <span class="font-semibold">Checkout</span>
+                    <span class="font-semibold text-xs md:text-base">Checkout</span>
                 </div>
                 <div class="flex-1 h-1 bg-gray-200 mx-2 md:mx-4"></div>
                 <div class="flex items-center text-secondary">
                     <div class="w-8 h-8 md:w-10 md:h-10 bg-gray-200 text-secondary rounded-full flex items-center justify-center font-bold mr-2 md:mr-3">
                         3
                     </div>
-                    <span class="font-semibold">Confirmation</span>
+                    <span class="font-semibold text-xs md:text-base">Confirmation</span>
                 </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
             <!-- Customer Details Form -->
-            <div data-aos="fade-right">
+            <div data-aos="fade-right" class="order-1 lg:order-1">
                 <div class="bg-white rounded-3xl shadow-lg border border-primary/10 p-4 md:p-8">
                     <div class="flex items-center mb-6">
                         <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mr-4">
                             <i class="fas fa-user text-primary text-xl"></i>
                         </div>
                         <div>
-                            <h2 class="text-2xl font-bold font-playfair text-dark">Customer Information</h2>
-                            <p class="text-secondary">Enter your details to complete the order</p>
+                            <h2 class="text-xl md:text-2xl font-bold font-playfair text-dark">Customer Information</h2>
+                            <p class="text-secondary text-sm md:text-base">Enter your details to complete the order</p>
                         </div>
                     </div>
 
@@ -314,7 +314,7 @@
             </div>
 
             <!-- Order Summary -->
-            <div data-aos="fade-left" class="sticky top-24 h-fit">
+            <div data-aos="fade-left" class="sticky top-24 h-fit order-2 lg:order-2 mt-8 lg:mt-0">
                 <div class="bg-white rounded-3xl shadow-lg border border-primary/10 p-4 md:p-8">
                     <div class="flex items-center mb-6">
                         <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center mr-4">
@@ -327,7 +327,7 @@
                     </div>
 
                     <!-- Order Items -->
-                    <div class="space-y-4 mb-6 max-h-80 overflow-y-auto pr-2 order-summary-container">
+                    <div class="space-y-4 mb-6 max-h-60 md:max-h-80 overflow-y-auto pr-2 order-summary-container">
                         @foreach($cart['items'] as $item)
                         <div class="flex items-center gap-4 p-4 rounded-2xl border border-gray-100 hover:border-primary/30 transition duration-300">
                             <img src="{{ $item['image'] ?? asset('images/placeholder-product.jpg') }}" 

@@ -8,7 +8,7 @@
 @endif
 
 @section('content')
-    <div class="bg-gray-50 min-h-screen">
+    <div class="bg-gray-50 min-h-screen overflow-x-hidden">
         <!-- Breadcrumbs -->
         <div class="max-w-7xl mx-auto px-4 py-4">
             <nav class="flex text-sm text-gray-500">
@@ -220,11 +220,11 @@
             <!-- Tabs Section -->
             <section class="py-16">
                 <div class="max-w-7xl mx-auto px-4">
-                    <div class="border-b border-gray-200 mb-12">
-                        <div class="flex gap-12">
-                            <button class="tab-button active pb-4 text-lg font-bold text-gray-900 border-b-4 border-primary transition-all">Description</button>
-                            <button class="tab-button pb-4 text-lg font-medium text-gray-500 hover:text-primary transition-all">Specifications</button>
-                            <button class="tab-button pb-4 text-lg font-medium text-gray-500 hover:text-primary transition-all">Reviews ({{ $product['review_count'] }})</button>
+                    <div class="border-b border-gray-200 mb-12 overflow-x-auto">
+                        <div class="flex gap-12 min-w-max">
+                            <button class="tab-button active pb-4 text-lg font-bold text-gray-900 border-b-4 border-primary transition-all whitespace-nowrap">Description</button>
+                            <button class="tab-button pb-4 text-lg font-medium text-gray-500 hover:text-primary transition-all whitespace-nowrap">Specifications</button>
+                            <button class="tab-button pb-4 text-lg font-medium text-gray-500 hover:text-primary transition-all whitespace-nowrap">Reviews ({{ $product['review_count'] }})</button>
                         </div>
                     </div>
 
