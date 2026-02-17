@@ -176,27 +176,8 @@
             <form id="brandForm" enctype="multipart/form-data">
                 <input type="hidden" id="brandId" name="id">
 
-                <div class="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
-                    <!-- Brand Logo Upload -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Brand Logo</label>
-                        <div class="flex items-center space-x-6">
-                            <div id="logoPreview"
-                                class="w-24 h-24 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-300">
-                                <i class="fas fa-image text-gray-400 text-2xl"></i>
-                            </div>
-                            <div class="flex-1">
-                                <input type="hidden" id="logo_url" name="logo_url">
-                                <button type="button" onclick="openMediaModal('logo')"
-                                    class="btn-secondary mb-2">
-                                    <i class="fas fa-upload mr-2"></i>Select from Media
-                                </button>
-                                <p class="text-xs text-gray-500">Recommended: 300x300px, JPG, PNG, or WebP. Max 2MB.</p>
-                                <div id="logoError" class="hidden mt-2 text-sm text-rose-600"></div>
-                            </div>
-                        </div>
-                    </div>
 
+                <div class="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
                     <!-- Basic Information -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
