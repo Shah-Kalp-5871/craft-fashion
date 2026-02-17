@@ -278,6 +278,18 @@
                                         <i class="fab fa-whatsapp mr-2"></i>
                                         Get Help
                                     </a>
+
+                                    @if(in_array($order->status, ['pending', 'confirmed']))
+                                    <button type="button" onclick="cancelOrder({{ $order->id }})" 
+                                            class="bg-red-50 text-red-600 border border-red-200 px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg hover:bg-red-600 hover:text-white flex items-center">
+                                        <i class="fas fa-times-circle mr-2"></i>
+                                        Cancel
+                                    </button>
+                                    <form id="cancel-form-{{ $order->id }}" action="{{ route('customer.account.orders.cancel', $order->id) }}" method="POST" class="hidden">
+                                        @csrf
+                                        <input type="hidden" name="cancellation_reason" id="cancel-reason-{{ $order->id }}">
+                                    </form>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -412,5 +424,37 @@
             });
         });
     });
+
+    function cancelOrder(orderId) {
+        // specific check for sweetalert, otherwise fallback
+        if (typeof Swal !== 'undefined') {
+            Swal.fire({
+                title: 'Cancel Order?',
+                text: "Please provide a reason for cancellation:",
+                input: 'text',
+                inputPlaceholder: 'Reason for cancellation...',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, cancel it!',
+                inputValidator: (value) => {
+                    if (!value) {
+                        return 'You need to write a reason!'
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('cancel-reason-' + orderId).value = result.value;
+                    document.getElementById('cancel-form-' + orderId).submit();
+                }
+            });
+        } else {
+            const reason = prompt("Please provide a reason for cancellation:");
+            if (reason) {
+                document.getElementById('cancel-reason-' + orderId).value = reason;
+                document.getElementById('cancel-form-' + orderId).submit();
+            }
+        }
+    }
 </script>
 @endpush
