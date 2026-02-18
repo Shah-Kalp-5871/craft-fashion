@@ -362,6 +362,60 @@
                 @endif
             </div>
         </div>
+    <!-- =============================
+            VISITOR STATISTICS
+        ============================= -->
+    <div class="mb-6 lg:mb-8 mt-12">
+        <h3 class="text-lg lg:text-xl font-bold text-gray-800 mb-4">Visitor Statistics</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+            <!-- Today's Unique Visitors -->
+            <div class="bg-white rounded-xl lg:rounded-2xl shadow-sm border border-gray-100 p-4 lg:p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs lg:text-sm font-medium text-gray-600">Today's Visitors</p>
+                        <p class="text-xl lg:text-2xl font-bold text-gray-900 mt-1">{{ number_format($visitorStats['today']) }}</p>
+                        <p class="text-xs lg:text-sm text-emerald-600 mt-1">
+                            Unique daily visits
+                        </p>
+                    </div>
+                    <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-blue-400 to-indigo-600 rounded-lg lg:rounded-xl flex items-center justify-center">
+                        <i class="fas fa-user-check text-white text-base lg:text-lg"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- This Month's Unique Visitors -->
+            <div class="bg-white rounded-xl lg:rounded-2xl shadow-sm border border-gray-100 p-4 lg:p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs lg:text-sm font-medium text-gray-600">This Month's Visitors</p>
+                        <p class="text-xl lg:text-2xl font-bold text-gray-900 mt-1">{{ number_format($visitorStats['month']) }}</p>
+                        <p class="text-xs lg:text-sm text-gray-500 mt-1">
+                            {{ $visitorStats['month_name'] }}
+                        </p>
+                    </div>
+                    <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-purple-400 to-pink-600 rounded-lg lg:rounded-xl flex items-center justify-center">
+                        <i class="fas fa-calendar-check text-white text-base lg:text-lg"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Total Unique Visitors -->
+            <div class="bg-white rounded-xl lg:rounded-2xl shadow-sm border border-gray-100 p-4 lg:p-6 card-hover">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-xs lg:text-sm font-medium text-gray-600">Total Unique Visitors</p>
+                        <p class="text-xl lg:text-2xl font-bold text-gray-900 mt-1">{{ number_format($visitorStats['total']) }}</p>
+                        <p class="text-xs lg:text-sm text-gray-500 mt-1">
+                            All time records
+                        </p>
+                    </div>
+                    <div class="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-r from-emerald-400 to-teal-600 rounded-lg lg:rounded-xl flex items-center justify-center">
+                        <i class="fas fa-globe text-white text-base lg:text-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 @endsection

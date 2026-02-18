@@ -146,6 +146,9 @@ class DashboardController extends Controller
             'low_stock_products' => $lowStockProducts,
             'out_of_stock_products' => $outOfStockProducts,
             'abandoned_carts' => $abandonedCarts,
+            'today_visitors' => DB::table('visitors')->where('visit_date', $today->format('Y-m-d'))->count(),
+            'month_visitors' => DB::table('visitors')->whereMonth('visit_date', date('m'))->whereYear('visit_date', date('Y'))->count(),
+            'total_visitors' => DB::table('visitors')->count(),
         ];
 
         // ==================== RECENT ORDERS ====================
@@ -300,16 +303,23 @@ class DashboardController extends Controller
             })
             ->toArray();
 
-        return view('admin.dashboard.index')
-            ->with('stats', $stats)
-            ->with('recentOrders', $recentOrders)
-            ->with('topProducts', $topProducts)
-            ->with('recentCustomers', $recentCustomers)
-            ->with('revenueChartData', $revenueChartData)
-            ->with('monthlyRevenue', $monthlyRevenue)
-            ->with('orderStatusDistribution', $orderStatusDistribution)
-            ->with('topCategories', $topCategories)
-            ->with('salesByPaymentMethod', $salesByPaymentMethod);
+        return view('admin.dashboard.index', [
+            'stats' => $stats,
+            'recentOrders' => $recentOrders,
+            'topProducts' => $topProducts,
+            'recentCustomers' => $recentCustomers,
+            'revenueChartData' => $revenueChartData,
+            'monthlyRevenue' => $monthlyRevenue,
+            'orderStatusDistribution' => $orderStatusDistribution,
+            'topCategories' => $topCategories,
+            'salesByPaymentMethod' => $salesByPaymentMethod,
+            'visitorStats' => [
+                'today' => DB::table('visitors')->where('visit_date', $today->format('Y-m-d'))->count(),
+                'month' => DB::table('visitors')->whereMonth('visit_date', date('m'))->whereYear('visit_date', date('Y'))->count(),
+                'total' => DB::table('visitors')->count(),
+                'month_name' => date('F Y'),
+            ]
+        ]);
     }
 
     public function getChartData(Request $request)
