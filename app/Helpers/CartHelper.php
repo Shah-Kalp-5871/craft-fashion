@@ -289,13 +289,22 @@ class CartHelper
         $discountTotal = 0;
         $offer = null;
 
-        // Apply offer discount if exists
+        // Apply offer discount if exists or check for auto-apply
         if ($cart->offer_id) {
             $offer = \App\Models\Offer::find($cart->offer_id);
             if ($offer && $offer->isActive()) {
                 $discountTotal = $this->calculateDiscount($offer, $subtotal, $cart->items);
             } else {
                 $cart->offer_id = null;
+            }
+        }
+        
+        // If still no offer, check for auto-apply
+        if (!$cart->offer_id) {
+            $offer = $this->findBestAutoApplyOffer($subtotal, $cart->customer_id);
+            if ($offer) {
+                $cart->offer_id = $offer->id;
+                $discountTotal = $this->calculateDiscount($offer, $subtotal, $cart->items);
             }
         }
 
@@ -386,6 +395,18 @@ class CartHelper
             }
         }
 
+        // If no manual offer, check for auto-apply
+        if (!isset($cart['offer_id'])) {
+            $offer = $this->findBestAutoApplyOffer($subtotal);
+            if ($offer) {
+                $cart['offer_id'] = $offer->id;
+                $cart['offer_code'] = $offer->code;
+                $cart['offer_type'] = $offer->offer_type;
+                $cart['discount_value'] = $offer->discount_value;
+                $discountTotal = $this->calculateDiscount($offer, $subtotal, collect($cart['items']));
+            }
+        }
+
         $taxTotal = 0;
         $taxBreakdown = [];
         $effectiveSubtotalRatio = $subtotal > 0 ? ($subtotal - $discountTotal) / $subtotal : 0;
@@ -453,6 +474,32 @@ class CartHelper
         }
 
         return min($discount, $subtotal);
+    }
+
+    private function findBestAutoApplyOffer($subtotal, $customerId = null)
+    {
+        return \App\Models\Offer::active()
+            ->autoApply()
+            ->where(function($query) use ($subtotal) {
+                $query->whereNull('min_cart_amount')
+                      ->orWhere('min_cart_amount', '<=', $subtotal);
+            })
+            ->where(function($query) use ($subtotal) {
+                $query->whereNull('max_cart_amount')
+                      ->orWhere('max_cart_amount', '>=', $subtotal);
+            })
+            ->get()
+            ->filter(function($offer) use ($customerId) {
+                return $offer->canApply($customerId);
+            })
+            ->sortByDesc(function($offer) use ($subtotal) {
+                // Heuristic: pick the one with highest discount
+                if ($offer->offer_type === 'percentage') {
+                    return $subtotal * ($offer->discount_value / 100);
+                }
+                return $offer->discount_value;
+            })
+            ->first();
     }
 
     public function saveLocalCart($cart)
