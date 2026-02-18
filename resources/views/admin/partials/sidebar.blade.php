@@ -93,21 +93,21 @@ $navItems = [
         'route' => 'admin.orders.index',
     ],
 
-    // 'offers' => [
-    //     'title' => 'Offers',
-    //     'icon' => 'fas fa-percentage',
-    //     'route' => 'admin.offers.index',
-    //     'submenu' => [
-    //         'all' => [
-    //             'title' => 'All Offers',
-    //             'route' => 'admin.offers.index',
-    //         ],
-    //         'create' => [
-    //             'title' => 'Add New',
-    //             'route' => 'admin.offers.create',
-    //         ],
-    //     ],
-    // ],
+    'offers' => [
+        'title' => 'Offers',
+        'icon' => 'fas fa-percentage',
+        'route' => 'admin.offers.index',
+        'submenu' => [
+            'all' => [
+                'title' => 'All Offers',
+                'route' => 'admin.offers.index',
+            ],
+            'create' => [
+                'title' => 'Add New',
+                'route' => 'admin.offers.create',
+            ],
+        ],
+    ],
 
     'users' => [
         'title' => 'Customers',

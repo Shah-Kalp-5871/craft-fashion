@@ -324,6 +324,9 @@ Route::prefix('admin')->group(function () {
             Route::post('/tags/bulk-delete', [\App\Http\Controllers\Api\Admin\TagController::class, 'bulkDelete'])->name('admin.api.tags.bulk-delete');
             Route::apiResource('tags', \App\Http\Controllers\Api\Admin\TagController::class)->names('admin.api.tags');
 
+            // Products API
+            Route::get('/products/dropdown', [\App\Http\Controllers\Api\Admin\ProductController::class, 'dropdown'])->name('admin.api.products.dropdown');
+
             // Media API
             Route::get('/media', [AdminMedia::class, 'getData'])->name('admin.api.media.index');
 
@@ -358,6 +361,7 @@ Route::prefix('admin')->group(function () {
             Route::get('/offers/statistics', [\App\Http\Controllers\Api\Admin\OfferController::class, 'statistics'])->name('admin.api.offers.statistics');
             Route::get('/offers/types', [\App\Http\Controllers\Api\Admin\OfferController::class, 'types'])->name('admin.api.offers.types');
             Route::get('/offers/dropdown', [\App\Http\Controllers\Api\Admin\OfferController::class, 'dropdown'])->name('admin.api.offers.dropdown');
+            Route::get('/offers/validate-code', [\App\Http\Controllers\Api\Admin\OfferController::class, 'validateCode'])->name('admin.api.offers.validate-code');
             Route::post('/offers/{id}/toggle-status', [\App\Http\Controllers\Api\Admin\OfferController::class, 'toggleStatus'])->name('admin.api.offers.toggle-status');
             Route::post('/offers/{id}/toggle-auto-apply', [\App\Http\Controllers\Api\Admin\OfferController::class, 'toggleAutoApply'])->name('admin.api.offers.toggle-auto-apply');
             Route::post('/offers/bulk-delete', [\App\Http\Controllers\Api\Admin\OfferController::class, 'bulkDelete'])->name('admin.api.offers.bulk-delete');

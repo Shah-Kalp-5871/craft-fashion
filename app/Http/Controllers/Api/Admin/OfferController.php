@@ -16,6 +16,15 @@ use Illuminate\Support\Facades\Validator;
 
 class OfferController extends Controller
 {
+    private function apiResponse($success = true, $data = null, $message = '', $statusCode = 200)
+    {
+        return response()->json([
+            'success' => $success,
+            'data' => $data,
+            'message' => $message,
+        ], $statusCode);
+    }
+
     /**
      * Display a listing of offers.
      */
@@ -61,17 +70,13 @@ class OfferController extends Controller
             $perPage = $request->get('per_page', 10);
             $offers = $query->paginate($perPage);
 
-            return response()->json([
-                'success' => true,
-                'data' => new OfferCollection($offers),
-                'message' => 'Offers retrieved successfully'
-            ]);
+            $resource = new OfferCollection($offers);
+            $responseData = $resource->response()->getData(true);
+
+            return $this->apiResponse(true, $responseData, 'Offers retrieved successfully');
 
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Failed to retrieve offers: ' . $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->apiResponse(false, null, 'Failed to retrieve offers: ' . $e->getMessage(), 500);
         }
     }
 

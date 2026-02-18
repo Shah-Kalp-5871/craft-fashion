@@ -1003,9 +1003,9 @@
         }
 
         // Initialize Tabulator table
-        function initializeOffersTable(data = []) {
+        function initializeOffersTable() {
             offersTable = new Tabulator("#offersTable", {
-                data: data,
+                // Remove data: data to ensure ajaxURL is prioritized
                 layout: "fitDataFill",
                 height: "100%",
                 responsiveLayout: "hide",
@@ -1013,24 +1013,54 @@
                 paginationSize: perPage,
                 paginationSizeSelector: [10, 25, 50, 100],
                 paginationCounter: "rows",
-                ajaxURL: "{{ url('') }}/api/admin/offers",
+                paginationMode: "remote", // Explicitly set remote mode
+                sortMode: "remote",
+                filterMode: "remote",
+                ajaxURL: "{{ url('') }}/admin/api/offers",
+                ajaxConfig: {
+                    method: "GET",
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Authorization': `Bearer ${window.ADMIN_API_TOKEN || "{{ session('admin_api_token') }}"}`
+                    }
+                },
                 ajaxParams: {
                     sort: 'created_at',
                     direction: 'desc'
                 },
                 ajaxResponse: function(url, params, response) {
+                    console.log('Offers API Response:', response);
                     if (response.success) {
                         // Hide loading state
-                        document.getElementById('loadingState').style.display = 'none';
-
-                        // Ensure we're returning the correct data structure
-                        if (response.data && response.data.data) {
-                            updatePaginationInfo(response.data.meta);
-                            return response.data.data;
+                        if (document.getElementById('loadingState')) {
+                            document.getElementById('loadingState').style.display = 'none';
                         }
-                        return [];
+
+                        // Check if data is nested (API Resource style)
+                        if (response.data && response.data.data) {
+                            if (response.data.meta) {
+                                updatePaginationInfo(response.data.meta);
+                                return {
+                                    data: response.data.data,
+                                    last_page: response.data.meta.last_page || 1
+                                };
+                            }
+                            return {
+                                data: response.data.data,
+                                last_page: 1
+                            };
+                        }
+                        
+                        // Handle flat data structure
+                        if (response.data && Array.isArray(response.data)) {
+                            return {
+                                data: response.data,
+                                last_page: response.meta ? response.meta.last_page : 1
+                            };
+                        }
                     }
-                    return [];
+                    console.error('Offers API Error:', response.message || 'Unknown error');
+                    return { data: [], last_page: 0 };
                 },
                 ajaxError: function(xhr, textStatus, errorThrown) {
                     console.error('Ajax error:', xhr, textStatus, errorThrown);
@@ -1262,51 +1292,11 @@
         }
 
         // Load offers data and initialize Tabulator
-        async function loadOffersData(page = 1, perPage = 10) {
-            try {
-                // Show loading state
-                document.getElementById('loadingState').style.display = 'block';
-
-                const response = await axiosInstance.get('offers', {
-                    params: {
-                        page: page,
-                        per_page: perPage,
-                        sort: 'created_at',
-                        direction: 'desc'
-                    }
-                });
-
-                if (response.data.success) {
-                    const offers = response.data.data.data || [];
-                    const meta = response.data.data.meta || {};
-
-                    // Update pagination info
-                    currentPage = meta.current_page || 1;
-                    perPage = meta.per_page || 10;
-
-                    // Initialize or update Tabulator
-                    if (!offersTable) {
-                        initializeOffersTable(offers);
-                    } else {
-                        offersTable.setData(offers);
-                        updatePaginationInfo(meta);
-                    }
-
-                    // Hide loading state
-                    document.getElementById('loadingState').style.display = 'none';
-                } else {
-                    toastr.error('Failed to load offers: ' + (response.data.message || 'Unknown error'));
-                    document.getElementById('loadingState').style.display = 'none';
-                }
-            } catch (error) {
-                console.error('Error loading offers:', error);
-                toastr.error('Failed to load offers. Check console for details.');
-                document.getElementById('loadingState').style.display = 'none';
-
-                // Initialize table with empty data if error
-                if (!offersTable) {
-                    initializeOffersTable([]);
-                }
+        async function loadOffersData() {
+            if (!offersTable) {
+                initializeOffersTable();
+            } else {
+                offersTable.setData();
             }
         }
 

@@ -57,10 +57,10 @@
                     <option value="">Select Offer Type</option>
                     <option value="percentage">Percentage Discount</option>
                     <option value="fixed">Fixed Amount Discount</option>
-                    <option value="bogo">Buy One Get One (BOGO)</option>
+                    <!-- <option value="bogo">Buy One Get One (BOGO)</option>
                     <option value="buy_x_get_y">Buy X Get Y</option>
                     <option value="free_shipping">Free Shipping</option>
-                    <option value="tiered">Tiered Discount</option>
+                    <option value="tiered">Tiered Discount</option> -->
                 </select>
                 <div id="offer_typeError" class="hidden mt-1 text-sm text-rose-600"></div>
             </div>
@@ -295,7 +295,7 @@
         <script>
             // Axios instance
             const axiosInstance = axios.create({
-                baseURL: '{{ url('') }}/api/admin',
+                baseURL: '{{ url('') }}/admin/api',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
                     'Authorization': `Bearer ${window.ADMIN_API_TOKEN || "{{ session('admin_api_token') }}"}`
@@ -541,7 +541,7 @@
 
                 if (selectedVariants.size === 0) {
                     container.innerHTML = '<p class="text-gray-500 text-sm">No products selected</p>';
-                    variantsInput.value = '';
+                    // variantsInput.value = '';
                     return;
                 }
 
