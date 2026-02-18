@@ -233,6 +233,38 @@
                                 <span id="summary-total" class="text-primary text-lg sm:text-xl">₹{{ number_format($total, 2) }}</span>
                             </div>
                         </div>
+
+                        <!-- Promo Code Section -->
+                        <div class="mb-6">
+                            <h3 class="text-sm font-bold text-dark mb-3 uppercase tracking-wider">Promo Code</h3>
+                            <div id="promo-input-container" class="{{ !empty($cart['offer']) ? 'hidden' : '' }}">
+                                <div class="flex gap-2">
+                                    <input type="text" id="coupon_code" placeholder="Enter code" 
+                                           class="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:ring-primary focus:border-primary focus:outline-none uppercase">
+                                    <button type="button" onclick="applyCoupon()" 
+                                            class="bg-dark text-white px-4 py-2.5 rounded-xl text-sm font-semibold hover:bg-black transition duration-300">
+                                        Apply
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="applied-promo-container" class="{{ empty($cart['offer']) ? 'hidden' : '' }}">
+                                <div class="flex items-center justify-between bg-primary/5 border border-primary/20 rounded-xl p-3">
+                                    <div class="flex items-center">
+                                        <div class="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mr-3">
+                                            <i class="fas fa-tag text-primary text-xs"></i>
+                                        </div>
+                                        <div>
+                                            <p id="applied-coupon-name" class="text-sm font-bold text-dark mb-0">{{ $cart['offer']['code'] ?? '' }}</p>
+                                            <p class="text-xs text-secondary">Coupon applied</p>
+                                        </div>
+                                    </div>
+                                    <button type="button" onclick="removeCoupon()" class="text-red-500 hover:text-red-700 text-sm font-medium">
+                                        Remove
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                         
                         <!-- Checkout Actions -->
                         <div class="space-y-3 sm:space-y-4">
@@ -419,10 +451,80 @@ async function updateQuantity(itemId, quantity) {
         console.error(error);
         // Revert on error
         const msg = error.response?.data?.message || 'Failed to update quantity';
-        alert(msg);
+        toastr.error(msg);
         // Optional: reload or revert value
     } finally {
         totalEls.forEach(el => el.style.opacity = '1');
+    }
+}
+
+async function applyCoupon() {
+    const code = document.getElementById('coupon_code').value.trim();
+    if (!code) {
+        toastr.warning('Please enter a coupon code');
+        return;
+    }
+
+    try {
+        Swal.fire({
+            title: 'Applying Coupon...',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        const response = await axios.post(`{{ route('customer.cart.apply-coupon') }}`, { coupon_code: code });
+        
+        if (response.data.success) {
+            Swal.fire({
+                title: 'Applied!',
+                text: response.data.message || 'Coupon applied successfully',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+            
+            updateSummary(response.data.cart);
+            document.getElementById('coupon_code').value = '';
+        }
+    } catch (error) {
+        console.error(error);
+        const msg = error.response?.data?.message || 'Failed to apply coupon';
+        Swal.fire({
+            title: 'Error!',
+            text: msg,
+            icon: 'error'
+        });
+    }
+}
+
+async function removeCoupon() {
+    try {
+        Swal.fire({
+            title: 'Removing Coupon...',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        const response = await axios.post(`{{ route('customer.cart.remove-coupon') }}`);
+        
+        if (response.data.success) {
+            Swal.fire({
+                title: 'Removed!',
+                text: response.data.message || 'Coupon removed successfully',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false
+            });
+            
+            updateSummary(response.data.cart);
+        }
+    } catch (error) {
+        console.error(error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'Failed to remove coupon',
+            icon: 'error'
+        });
     }
 }
 
@@ -430,10 +532,35 @@ function updateSummary(cart) {
     const subtotalEl = document.getElementById('summary-subtotal');
     if (subtotalEl) subtotalEl.textContent = formatCurrency(cart.subtotal);
     
+    // Manage Coupon UI
+    const promoInputContainer = document.getElementById('promo-input-container');
+    const appliedPromoContainer = document.getElementById('applied-promo-container');
+    const appliedCouponName = document.getElementById('applied-coupon-name');
+    
+    if (cart.offer) {
+        if (promoInputContainer) promoInputContainer.classList.add('hidden');
+        if (appliedPromoContainer) appliedPromoContainer.classList.remove('hidden');
+        if (appliedCouponName) appliedCouponName.textContent = cart.offer.code;
+    } else {
+        if (promoInputContainer) promoInputContainer.classList.remove('hidden');
+        if (appliedPromoContainer) appliedPromoContainer.classList.add('hidden');
+    }
+
     const discountEl = document.getElementById('summary-discount');
-    if (discountEl && cart.discount_total > 0) {
-        discountEl.textContent = '-' + formatCurrency(cart.discount_total);
-        discountEl.parentElement.classList.remove('hidden');
+    if (cart.discount_total > 0) {
+        if (discountEl) {
+            discountEl.textContent = '-' + formatCurrency(cart.discount_total);
+            discountEl.parentElement.classList.remove('hidden');
+        } else {
+            // Find tax element to insert discount before it
+            const taxEl = document.getElementById('summary-tax');
+            if (taxEl && taxEl.parentElement) {
+                const discountRow = document.createElement('div');
+                discountRow.className = 'flex justify-between items-center py-1.5 sm:py-2 text-green-600';
+                discountRow.innerHTML = `<span class="text-sm sm:text-base">Discount</span><span id="summary-discount" class="font-semibold text-sm sm:text-base">-${formatCurrency(cart.discount_total)}</span>`;
+                taxEl.parentElement.parentNode.insertBefore(discountRow, taxEl.parentElement);
+            }
+        }
     } else if (discountEl) {
         discountEl.parentElement.classList.add('hidden');
     }
