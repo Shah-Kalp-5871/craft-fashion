@@ -362,12 +362,14 @@
                 @endif
             </div>
         </div>
+    </div>
+
     <!-- =============================
             VISITOR STATISTICS
         ============================= -->
-    <div class="mb-6 lg:mb-8 mt-12">
+    <div class="mb-6 lg:mb-8">
         <h3 class="text-lg lg:text-xl font-bold text-gray-800 mb-4">Visitor Statistics</h3>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6">
             <!-- Today's Unique Visitors -->
             <div class="bg-white rounded-xl lg:rounded-2xl shadow-sm border border-gray-100 p-4 lg:p-6 card-hover">
                 <div class="flex items-center justify-between">
