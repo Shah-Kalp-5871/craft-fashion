@@ -11,6 +11,12 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminSeeder::class,
             SettingsSeeder::class,
+            PageSeeder::class,
+            DemoCustomerSeeder::class,
+            JewelryStoreSeeder::class,
+            ClothingStoreSeeder::class,
+            HomeSeeder::class,
+            TestimonialSeeder::class,
             ReviewSeeder::class,
         ]);
     }
