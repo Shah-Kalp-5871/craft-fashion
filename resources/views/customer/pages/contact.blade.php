@@ -50,8 +50,9 @@
                     </div>
                     <h3 class="text-xl font-bold text-dark mb-2">Email Support</h3>
                     <p class="text-secondary mb-4">Send us your queries or proposals</p>
-                    <a href="mailto:{{ \App\Helpers\SettingsHelper::get('store_email', config('constants.SITE_EMAIL')) }}" class="w-full py-3 px-4 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors font-medium truncate">
-                        <i class="fas fa-envelope mr-2"></i> {{ \App\Helpers\SettingsHelper::get('store_email', config('constants.SITE_EMAIL')) }}
+                    @php $email = \App\Helpers\SettingsHelper::get('store_email', config('constants.SITE_EMAIL')); @endphp
+                    <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ $email }}" class="w-full py-3 px-4 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors font-medium truncate" target="_blank">
+                        <i class="fas fa-envelope mr-2"></i> {{ $email }}
                     </a>
                     <p class="text-sm text-secondary mt-4">
                         <i class="fas fa-clock mr-1"></i>

@@ -130,12 +130,20 @@
 
     <div class="invoice-container">
         <div class="header">
+            @php 
+                $store = \App\Helpers\SettingsHelper::storeInfo();
+                $logoUrl = \App\Helpers\SettingsHelper::get('logo_url');
+            @endphp
             <div class="company-info">
-                <div class="logo">{{ config('constants.SITE_NAME', 'CRAFT FASHION') }}</div>
+                @if($logoUrl)
+                    <img src="{{ $logoUrl }}" alt="{{ $store['name'] }}" style="max-height: 60px; margin-bottom: 10px;">
+                @else
+                    <div class="logo">{{ $store['name'] }}</div>
+                @endif
                 <p>
-                    123 Fashion Street, New Delhi, India<br>
-                    Phone: +91 98765 43210<br>
-                    Email: support@craftfashion.com
+                    {{ $store['address'] }}<br>
+                    Phone: {{ $store['phone'] }}<br>
+                    Email: {{ $store['email'] }}
                 </p>
             </div>
             <div class="invoice-details">
@@ -155,6 +163,9 @@
                 <p>
                     <strong>{{ $order->billing_address['name'] ?? 'N/A' }}</strong><br>
                     {{ $order->billing_address['address'] ?? '' }}<br>
+                    @if(!empty($order->billing_address['address2']))
+                        {{ $order->billing_address['address2'] }}<br>
+                    @endif
                     {{ $order->billing_address['city'] ?? '' }}, {{ $order->billing_address['state'] ?? '' }} - {{ $order->billing_address['pincode'] ?? '' }}<br>
                     {{ $order->billing_address['country'] ?? '' }}<br>
                     Phone: {{ $order->billing_address['phone'] ?? $order->billing_address['mobile'] ?? 'N/A' }}
@@ -165,6 +176,9 @@
                 <p>
                     <strong>{{ $order->shipping_address['name'] ?? 'N/A' }}</strong><br>
                     {{ $order->shipping_address['address'] ?? '' }}<br>
+                    @if(!empty($order->shipping_address['address2']))
+                        {{ $order->shipping_address['address2'] }}<br>
+                    @endif
                     {{ $order->shipping_address['city'] ?? '' }}, {{ $order->shipping_address['state'] ?? '' }} - {{ $order->shipping_address['pincode'] ?? '' }}<br>
                     {{ $order->shipping_address['country'] ?? '' }}<br>
                     Phone: {{ $order->shipping_address['phone'] ?? $order->shipping_address['mobile'] ?? 'N/A' }}
@@ -185,20 +199,24 @@
                 @foreach($order->items as $item)
                     <tr>
                         <td>
-                            <strong>{{ $item->product->name ?? 'Product' }}</strong>
+                            <strong>{{ $item->product_name ?? ($item->product->name ?? 'Product') }}</strong>
                             <br>
                             <small>
-                                @if($item->variant)
-                                    SKU: {{ $item->variant->sku }}
+                                SKU: {{ $item->sku ?? ($item->variant->sku ?? 'N/A') }}
+                                @if(!empty($item->attributes) && is_array($item->attributes))
+                                    @foreach($item->attributes as $key => $value)
+                                        | {{ ucfirst(str_replace('_', ' ', $key)) }}: {{ is_array($value) ? implode(', ', $value) : $value }}
+                                    @endforeach
+                                @elseif($item->variant && $item->variant->attributes)
                                     @foreach($item->variant->attributes as $attr)
                                         | {{ $attr->attribute->name }}: {{ $attr->value }}
                                     @endforeach
                                 @endif
                             </small>
                         </td>
-                        <td>{{ number_format($item->price, 2) }}</td>
+                        <td>{{ number_format($item->unit_price ?? $item->price ?? 0, 2) }}</td>
                         <td style="text-align: center;">{{ $item->quantity }}</td>
-                        <td style="text-align: right;">{{ number_format($item->price * $item->quantity, 2) }}</td>
+                        <td style="text-align: right;">{{ number_format(($item->unit_price ?? $item->price ?? 0) * $item->quantity, 2) }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -228,13 +246,13 @@
                 @endif
                 <div class="summary-row total">
                     <span>Grand Total:</span>
-                    <span>{{ $order->currency }} {{ number_format($order->grand_total, 2) }}</span>
+                    <span>{{ $store['currency_symbol'] ?? $order->currency }} {{ number_format($order->grand_total, 2) }}</span>
                 </div>
             </div>
         </div>
 
         <div class="footer">
-            <p>Thank you for shopping with {{ config('constants.SITE_NAME', 'CRAFT FASHION') }}!</p>
+            <p>Thank you for shopping with {{ $store['name'] }}!</p>
             <p>This is a computer generated invoice and does not require a signature.</p>
         </div>
     </div>

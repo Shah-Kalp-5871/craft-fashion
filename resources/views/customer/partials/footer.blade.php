@@ -22,7 +22,7 @@
             </div>
             
             <div>
-                <h4 class="text-lg font-semibold mb-4">Contact Us</h4>
+                <h4 class="text-lg font-semibold mb-4">Contact</h4>
                 <ul class="space-y-2">
                     <li class="flex items-start">
                         <i class="fas fa-map-marker-alt mt-1 mr-2"></i>
@@ -34,7 +34,8 @@
                     </li>
                     <li class="flex items-center">
                         <i class="fas fa-envelope mr-2"></i>
-                        <a href="mailto:{{ \App\Helpers\SettingsHelper::get('store_email', config('constants.SITE_EMAIL')) }}" class="hover:text-primary transition">{{ \App\Helpers\SettingsHelper::get('store_email', config('constants.SITE_EMAIL')) }}</a>
+                        @php $email = \App\Helpers\SettingsHelper::get('store_email', config('constants.SITE_EMAIL')); @endphp
+                        <a href="https://mail.google.com/mail/?view=cm&fs=1&to={{ $email }}" class="hover:text-primary transition" target="_blank">{{ $email }}</a>
                     </li>
                 </ul>
             </div>
