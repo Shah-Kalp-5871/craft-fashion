@@ -90,6 +90,8 @@
     <!-- Custom JavaScript -->
     <script src="{{ asset('js/admin/custom.js') }}"></script>
 
+    <!-- Load Lodash and Axios -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.5.0/axios.min.js"></script>
     <script>
         // Global Axios Configuration

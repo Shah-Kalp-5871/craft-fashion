@@ -176,15 +176,18 @@ function renderSearchResults(products) {
     if (products.length === 0) {
         resultsDiv.innerHTML = '<div class="p-4 text-gray-500 text-sm">No products found</div>';
     } else {
-        resultsDiv.innerHTML = products.map(p => `
-            <div onclick="selectProduct(${p.id}, '${p.name}', '${p.image}')" 
-                 class="flex items-center p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0 transition">
-                <img src="${p.image}" class="w-10 h-10 object-cover rounded mr-3">
-                <div>
-                    <div class="font-bold text-sm text-gray-800">${p.name}</div>
+        resultsDiv.innerHTML = products.map(p => {
+            const escapedName = p.name.replace(/'/g, "\\'");
+            return `
+                <div onclick="selectProduct(${p.id}, '${escapedName}', '${p.image}')" 
+                     class="flex items-center p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-0 transition">
+                    <img src="${p.image}" class="w-10 h-10 object-cover rounded mr-3">
+                    <div>
+                        <div class="font-bold text-sm text-gray-800">${p.name}</div>
+                    </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     }
     resultsDiv.classList.remove('hidden');
 }
@@ -224,11 +227,16 @@ function renderSelectedProducts() {
     }
 }
 
-// Close search results when clicking outside
-document.addEventListener('click', function(e) {
-    if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
-        resultsDiv.classList.add('hidden');
-    }
+// Initial render to set up event listeners for existing products if any
+document.addEventListener('DOMContentLoaded', function() {
+    renderSelectedProducts();
+    
+    // Close search results when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!searchInput.contains(e.target) && !resultsDiv.contains(e.target)) {
+            resultsDiv.classList.add('hidden');
+        }
+    });
 });
 </script>
 @endpush
