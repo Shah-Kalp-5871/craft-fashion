@@ -566,7 +566,7 @@
         wrapper.classList.remove('hidden');
 
         try {
-            const response = await axios.get(`categories/${categoryId}/specifications`);
+            const response = await axios.get(`{{ url('admin/products/category') }}/${categoryId}/specifications`);
 
             if(response.data.success) {
                 renderSpecifications(response.data.data);
@@ -647,7 +647,7 @@
         availableAttributes = [];
 
         try {
-            const response = await axios.get(`categories/${categoryId}/attributes`);
+            const response = await axios.get(`{{ url('admin/products/category') }}/${categoryId}/attributes`);
             loading.classList.add('hidden');
 
             if(response.data.success && response.data.data.length > 0) {
